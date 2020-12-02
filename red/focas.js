@@ -5,8 +5,6 @@
 */
 
 const Focas = require('focas-library');
-const {EventEmitter} = require('events');
-
 
 module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
@@ -51,10 +49,8 @@ module.exports = function (RED) {
 
     // <Begin> --- Config ---
     function FocasConfig(values) {
-
-        EventEmitter.call(this);
         RED.nodes.createNode(this, values);
-
+        let reconnect_timeout = 30000;
         let node = this;
 
         node.machineIP = values.machineIP;
@@ -68,6 +64,7 @@ module.exports = function (RED) {
         node.onClose = false;
 
         node.connectionStatus = 'offline';
+        node.timerReconnect = null;
 
         switch (node.machine) {
             case '0i':
@@ -89,7 +86,6 @@ module.exports = function (RED) {
             node.focas.on("error", (err) => node.onError(err));
             node.focas.on("connected", () => node.onConnect);
             node.focas.on("disconnected", () => node.onDisconnect);
-            
         };
 
         node.connect();
@@ -105,13 +101,15 @@ module.exports = function (RED) {
 
         node.onConnect = function onConnect() {
 
-            clearTimeout(node.timerReconnect);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
             node.manageStatus('online');
         };
 
         node.onDisconnect = function onDisconnect() {
+            node.manageStatus('offline');
 
+            node.manageStatus('connecting');
         }
 
         node.disconnect = function disconnect() {
@@ -128,9 +126,11 @@ module.exports = function (RED) {
 
         node.reconnect = function reconnect() {
 
-            clearTimeout(node.timerReconnect);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
-            if (node.onClose || node.userDisconnect || (node.connectionStatus == 'online')) {
+            node.disconnect();
+
+            if (node.onClose || (node.connectionStatus == 'online')) {
                 return;
             }
 
@@ -141,27 +141,21 @@ module.exports = function (RED) {
             return node.connectionStatus;
         }
 
-        // Begin::Event of Session Control Client - Open Protocol
         node.onError = function onError(error) {
-
             if (node.onClose) {
                 return;
             }
 
             node.manageStatus('offline');
 
-            node.emit("disconnect");
+            node.error(`${RED._("focas.endpoint.error")} ${error}`);
 
-            node.error(`${RED._("open-protocol.message.failed-connect")} ${error.address}:${error.port} ${error.code}`);
-
-            node.removeListeners();
-
-            clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), 5000);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
+            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
         };
 
         node.onClose = function onClose(error) {
-
+            node.error(error);
             if (node.onClose) {
                 return;
             }
@@ -171,12 +165,8 @@ module.exports = function (RED) {
 
             node.removeListeners();
 
-            clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), 5000);
-        };
-
-        node.onConnect = function onConnect(data) {
-            node.emit("connect", data);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
+            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
         };
 
         node.removeListeners = function removeListeners() {
@@ -184,17 +174,14 @@ module.exports = function (RED) {
             node.focas.removeListener("connected", (data) => node.onConnect(data));
             node.focas.removeListener("disconnected", (data) => node.onDisconnect(data));
         };
-        // End::Event of Session Control Client - Open Protocol
 
         node.on("close", () => {
-
             node.onClose = true;
-            clearTimeout(node.timerReconnect);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
             node.removeListeners();
 
             node.manageStatus('offline')
-            node.emit("disconnect");
             node.focas.destroy();
 
         });

@@ -6,6 +6,9 @@
                 "offline":"offline",
                 "connecting": "connecting",
                 "unknown": "unknown"
+            },
+            "error": {
+                "default": "Error"
             }
         },
         "functions": {
