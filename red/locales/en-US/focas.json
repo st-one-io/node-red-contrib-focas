@@ -1,5 +1,19 @@
 {
     "focas":{
+        "node": {
+            "label": {
+                "config": "Config",
+                "fn": "Function",
+                "forward-errors": "Forward Errors"
+            }
+        },
+        "config": {
+            "label": {
+                "ip" : "IP Adress",
+                "port": "Port",
+                "timeout": "Timeout"
+            }
+        },
         "endpoint": {
             "status": {
                 "online": "online",
@@ -9,10 +23,14 @@
             },
             "error": {
                 "default": "Error"
-            }
+            },
+            "functions": {
+                "unknown": "ERR_UN_FN - An unknown function was called"
         },
-        "functions": {
-            "unknown": "ERR_UN_FN - An unknown function was called"
+        "util": {
+            "label": {
+                "node": "FOCAS",
+                "name": "Name"
         }
     }
 }

@@ -48,17 +48,17 @@ module.exports = function (RED) {
     }
 
     // <Begin> --- Config ---
-    function FocasConfig(values) {
-        RED.nodes.createNode(this, values);
+    function FocasConfig(config) {
+        RED.nodes.createNode(this, config);
         let reconnect_timeout = 30000;
         let node = this;
 
-        node.machineIP = values.machineIP;
-        node.machinePort = Number(values.machinePort);
-        node.keepAlive = values.keepAlive;
-        node.timeout = values.timeout;
-        //node.machine = values.machine;
-        node.logLevel = values.logLevel;
+        node.machineIP = config.machineIP;
+        node.machinePort = Number(config.machinePort);
+        node.keepAlive = config.keepAlive;
+        node.timeout = config.timeout;
+        //node.machine = config.machine;
+        node.logLevel = config.logLevel;
         node.libBuild = null;
         node.userDisconnect = false;
         node.onClose = false;
@@ -73,7 +73,6 @@ module.exports = function (RED) {
         }
 
         node.connect = async function connect() {
-
             if (node.connectionStatus == 'online') {
                 return;
             }
@@ -187,7 +186,7 @@ module.exports = function (RED) {
         });
     }
 
-    RED.nodes.registerType("op config", FocasConfig);
+    RED.nodes.registerType("focas config", FocasConfig);
     // <End> --- Config
 
     // <Begin> --- Node
@@ -224,7 +223,7 @@ module.exports = function (RED) {
             let params = (msg.payload)? msg.payload : null;
 
             switch(fn){
-                case '01': 
+                case '1': 
                     node.endpoint.focas.cncStatInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
@@ -245,7 +244,7 @@ module.exports = function (RED) {
 
     }
 
-    RED.nodes.registerType("op node", FocasNode);
+    RED.nodes.registerType("focas node", FocasNode);
     // <End> --- Node
 
 };
