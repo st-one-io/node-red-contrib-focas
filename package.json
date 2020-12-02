@@ -1,0 +1,25 @@
+{
+  "name": "node-red-contrib-focas",
+  "version": "1.0.0",
+  "description": "Node-RED Node to communicate with CNCs using Fanuc FOCAS protocol",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/st-one-io/node-red-contrib-focas.git"
+  },
+  "keywords": [
+    "focas",
+    "node-red",
+    "fanuc",
+    "cnc"
+  ],
+  "author": "ST-One",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/st-one-io/node-red-contrib-focas/issues"
+  },
+  "homepage": "https://github.com/st-one-io/node-red-contrib-focas#readme"
+}
