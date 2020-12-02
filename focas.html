@@ -1,0 +1,1406 @@
+<!-- 
+  Copyright: (c) 2018-2020, Smart-Tech Controle e Automação
+  GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt) 
+-->
+
+<!-- --< Begin >--------- OpenProtocol Config (op config) ---------------------- -->
+<script type="text/x-red" data-template-name="op config">
+
+    <div class="form-row">
+        <label for="node-config-input-name">
+            <i class="fa fa-tag"></i>
+            <span data-i18n="open-protocol.util.label.name"></span>
+        </label>
+        <input type="text" id="node-config-input-name" data-i18n="[placeholder]open-protocol.util.label.name">
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-controllerIP">
+            <i class="fa fa-home"></i>
+            <span data-i18n="open-protocol.config.label.controller"></span>
+        </label>
+        <input type="text" style="width: 30%" id="node-config-input-controllerIP" data-i18n="[placeholder]open-protocol.config.label.controller">
+
+        <span style="margin-left:10px" data-i18n="open-protocol.config.label.port"></span>
+        <input type="text" id="node-config-input-controllerPort" style="width: 60px;" data-i18n="[placeholder]open-protocol.config.label.port">
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-keepAlive">
+            <i class="fa fa-clock-o"></i>
+            <span data-i18n="open-protocol.config.label.keep-alive"></span>
+        </label>
+        <input type="text" id="node-config-input-keepAlive"> ms
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-timeout">
+            <i class="fa fa-clock-o"></i>
+            <span data-i18n="open-protocol.config.label.timeout"></span>
+        </label>
+        <input type="text" id="node-config-input-timeout"> ms
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-retries">
+            <i class="fa fa-repeat"></i>
+            <span data-i18n="open-protocol.config.label.retries"></span>
+        </label>
+        <input type="text" id="node-config-input-retries"> times
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-linkLayer">
+            <i class="fa fa-link"></i>
+            <span data-i18n="open-protocol.config.label.force-link-layer"></span>
+        </label>
+        <select type="text" id="node-config-input-linkLayer">
+            <option value="auto" data-i18n="open-protocol.config.label.options.auto"></option>
+            <option value="true" data-i18n="open-protocol.config.label.options.true"></option>
+            <option value="false" data-i18n="open-protocol.config.label.options.false"></option>
+        </select>
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-disablemidparsing">
+            <i class="fa fa-tag"></i>
+            <span data-i18n="open-protocol.config.label.disable-mid-parsing"></span>
+        </label>
+        <input type="text" id="node-config-input-disablemidparsing" data-i18n="[placeholder]open-protocol.config.label.disable-mid-parsing">
+    </div>
+
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-config-input-rawData" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-config-input-rawData" style="width:70%;">
+            <span data-i18n="open-protocol.config.label.raw-data"></span>
+        </label>
+    </div>
+
+    <div class="form-row">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-config-input-generic" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-config-input-generic" style="width:70%;">
+            <span data-i18n="open-protocol.config.label.generic"></span>
+        </label>
+    </div>
+
+
+</script>
+
+<script type="text/x-red" data-help-name="op config">
+    <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
+    
+    <h3>Options</h3>
+    <dl class="message-properties">
+        <dt>Controller
+            <span class="property-type">IP Address</span>
+        </dt>
+        <dd> ip address of controller. </dd>
+    
+        <dt>Port
+            <span class="property-type">Number</span>
+        </dt>
+        <dd> port of controller. </dd>
+    
+        <dt>KeepAlive
+            <span class="property-type">Number</span>
+        </dt>
+        <dd> max time without communication. </dd>
+    
+        <dt>Timeout
+            <span class="property-type">Number</span>
+        </dt>
+        <dd> max time without connection. </dd>
+    
+        <dt>Retries
+            <span class="property-type">Number</span>
+        </dt>
+        <dd> retries of connection. </dd>
+    
+        <dt>Link Layer
+            <span class="property-type">Link Layer</span>
+        </dt>
+        <dd> Link Layer mode, 
+            <code>Auto</code>: auto negotiation,
+            <code>True</code>: force link layer,
+            <code>False</code>: disable link layer
+        </dd>
+    
+        <dt>Disable MID parsing
+            <span class="property-type">String</span>
+        </dt>
+        <dd> receiver MIDs with body not parsing. </dd>
+    
+        <dt>Raw Data
+            <span class="property-type">Boolean</span>
+        </dt>
+        <dd> adds the parameter <code>_raw</code> in all messages, containing the message buffer. </dd>
+    
+        <dt>Generic Mode
+            <span class="property-type">Boolean</span>
+        </dt>
+        <dd> the nodes use calls generics. </dd>
+    
+    </dl>
+
+</script>
+
+<script type="text/javascript">
+    RED.nodes.registerType('op config', {
+        category: 'config',
+        color: '#FFAAAA',
+        defaults: {
+            name: {
+                value: ""
+            },
+            controllerIP: {
+                value: "",
+                required: true
+            },
+            controllerPort: {
+                value: 4545,
+                required: true
+            },
+            keepAlive: {
+                value: 10000
+            },
+            timeout: {
+                value: 3000
+            },
+            retries: {
+                value: 3
+            },
+            disablemidparsing: {
+                value: ""
+            },
+            rawData: {
+                value: false
+            },
+            generic: {
+                value: false
+            },
+            linkLayer: {
+                value: "auto"
+            }
+        },
+        label: function () {
+
+            if (this.name) {
+                return this.name;
+            }
+
+            let name = this.controllerIP;
+
+            return name;
+        },
+        oneditprepare: function () {
+            $("#node-config-input-keepAlive").spinner({
+                min: 0
+            });
+            $("#node-config-input-timeout").spinner({
+                min: 0
+            });
+            $("#node-config-input-retries").spinner({
+                min: 0
+            });
+        }
+    });
+</script>
+<!-- --< End >--------- OpenProtocol Config (op config) ---------------------- -->
+
+
+<!-- --< Begin >--------- OpenProtocol Node (op node) ---------------------- -->
+
+<script type="text/x-red" data-template-name="op node">
+
+    <div class="form-row">
+        <label for="node-input-config">
+            <i class="fa fa-cog"></i>
+            <span data-i18n="open-protocol.node.label.config"></span>
+        </label>
+        <input type="text" id="node-input-config" data-i18n="[placeholder]open-protocol.node.label.config">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-midGroup">
+            <i class="fa fa-link"></i>
+            <span data-i18n="open-protocol.node.label.mid"></span>
+        </label>
+        <select style="width:70%;" id="node-input-midGroup"></select>
+    </div>
+
+    <!-- HIDE -->
+    <div class="form-row" id="div-custom-mid">
+        <label for="node-input-customMid">
+            <i class="fa fa-tag"></i>
+            <span data-i18n="open-protocol.node.label.custom-mid"></span>
+        </label>
+        <input type="text" id="node-input-customMid" data-i18n="[placeholder]open-protocol.node.label.custom-mid">
+    </div>
+    <!-- HIDE -->
+
+    <div class="form-row" id="div-revision">
+        <label for="node-input-revision">
+            <i class="fa fa-link"></i>
+            <span data-i18n="open-protocol.node.label.revision"></span>
+        </label>
+        <select style="width:70%;" id="node-input-revision"></select>
+    </div>
+
+    <!-- HIDE -->
+    <div class="form-row" id="div-custom-revision">
+        <label for="node-input-customRevision">
+            <i class="fa fa-tag"></i>
+            <span data-i18n="open-protocol.node.label.custom-revision"></span>
+        </label>
+        <input type="text" id="node-input-customRevision" data-i18n="[placeholder]open-protocol.node.label.custom-revision">
+    </div>
+    <!-- HIDE -->
+
+    <div class="form-row" id="div-auto-subscribe">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-autoSubscribe" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-autoSubscribe" style="width:70%;">
+            <span data-i18n="open-protocol.node.label.auto-subscribe"></span>
+        </label>
+    </div>
+
+    <div class="form-row" id="div-forward-errors">
+        <label>&nbsp;</label>
+        <input type="checkbox" id="node-input-forwardErrors" style="display: inline-block; width: auto; vertical-align: top;">
+        <label for="node-input-forwardErrors" style="width:70%;">
+            <span data-i18n="open-protocol.node.label.forward-errors"></span>
+        </label>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name">
+            <i class="fa fa-tag"></i>
+            <span data-i18n="open-protocol.util.label.name"></span>
+        </label>
+        <input type="text" id="node-input-name" data-i18n="[placeholder]open-protocol.util.label.name">
+    </div>
+
+    <div class="form-tips" id="div-tips">
+        <div id="code-info" style="height:auto; width:90%; font-family: monospace"></div>
+    </div>
+
+
+</script>
+
+<script type="text/x-red" data-help-name="op node">
+    <p>Tool communication using OpenProtocol</p>
+    <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
+
+    <h3>Inputs</h3>
+    <dl class="message-properties">
+        <p> Use the parameters according to tips in node. </p>
+        <dt>
+            payload
+            <span class="property-type"> string | buffer | object </span>
+        </dt>
+        <dt>
+            subscribe
+            <span class="property-type"> boolean </span>
+        </dt>
+    </dl>
+    
+    <h3>Outputs</h3>
+    <ol class="node-ports">
+        <li>Feedback
+            <dl class="message-properties">
+                <dt> msg <span class="property-type"> object </object></span> </dt>
+                <dd> header of MID. </dd>
+    
+                <dt> msg.payload <span class="property-type"> object | string </object></span> </dt>
+                <dd> body of MID. </dd>
+            </dl>
+        </li>
+    
+        <li>Data
+            <p> Available in <code>subscribe</code> and <code>custom</code> options. </p>
+            <dl class="message-properties">
+                <dt> msg <span class="property-type"> object </object></span> </dt>
+                <dd> header of MID. </dd>
+    
+                <dt> msg.payload <span class="property-type"> object | string </object></span> </dt>
+                <dd> body of MID. </dd>
+            </dl>
+        </li>
+    </ol>
+    
+    <h3>Options</h3>
+    <dl class="message-properties">
+        <dt>Config
+            <span class="property-type">OP Controller</span>
+        </dt>
+        <dd> select controller. </dd>
+    
+        <dt>Mid Group
+            <span class="property-type">MID Group</span>
+        </dt>
+        <dd> select function this node. </dd>
+    
+        <dt>Revision
+            <span class="property-type">Revision</span>
+        </dt>
+        <dd> select revision for MID Group, 
+            <code>Auto</code>: auto negotiation,
+            <code>Custom</code>: add revision not listed
+        </dd>
+    
+        <dt>Custom revision
+            <span class="property-type">Number</span>
+        </dt>
+        <dd> add number of custom revision. </dd>
+    
+        <dt>Auto Subscribe
+            <span class="property-type">Boolean</span>
+        </dt>
+        <dd> active auto subscribe on start. </dd>
+    
+        <dt>Forward Errors
+            <span class="property-type">Boolean</span>
+        </dt>
+        <dd> this option adds parameter <code>msg.error</code> in error cases. </dd>
+    </dl>
+
+</script>
+
+<script type="text/javascript">
+    (function () {
+
+        //__AUTO__GENERATED__
+        let base = {
+            "3": {
+                "text": "3 - communicationStop",
+                "typeRequest": "COMMAND",
+                "family": "communicationStop",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "11": {
+                "text": "11 - psetID",
+                "typeRequest": "REQUEST",
+                "family": "psetID",
+                "implemented": true,
+                "revisions": [1, 2, 3],
+                "params": []
+            },
+            "13": {
+                "text": "13 - psetData",
+                "typeRequest": "REQUEST",
+                "family": "psetData",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "15": {
+                "text": "15 - psetSelected",
+                "typeRequest": "SUBSCRIBE",
+                "family": "psetSelected",
+                "implemented": true,
+                "revisions": [2, 1],
+                "params": []
+            },
+            "18": {
+                "text": "18 - selectPset",
+                "typeRequest": "COMMAND",
+                "family": "selectPset",
+                "implemented": true,
+                "revisions": [1],
+                "params": {"1": [{"name": "parameterSetID", "type": "number", "desc": "0 - 999"}]}
+            },
+            "19": {
+                "text": "19 - setPsetBatchSize",
+                "typeRequest": "COMMAND",
+                "family": "setPsetBatchSize",
+                "implemented": true,
+                "revisions": [1],
+                "params": {
+                    "1": [{"name": "parameterSetID", "type": "number", "desc": "0 - 999"}, {
+                        "name": "batchSize",
+                        "type": "number",
+                        "desc": "0 - 99"
+                    }]
+                }
+            },
+            "20": {
+                "text": "20 - resetPsetBatchCounter",
+                "typeRequest": "COMMAND",
+                "family": "resetPsetBatchCounter",
+                "implemented": true,
+                "revisions": [1],
+                "params": {"1": [{"name": "parameterSetID", "type": "number", "desc": "0 - 999"}]}
+            },
+            "22": {
+                "text": "22 - lockAtBatchDoneUpload",
+                "typeRequest": "SUBSCRIBE",
+                "family": "lockAtBatchDoneUpload",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "25": {
+                "text": "25 - parameterUserSetDownload",
+                "typeRequest": "COMMAND",
+                "family": "parameterUserSetDownload",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "31": {
+                "text": "31 - jobIdUpload",
+                "typeRequest": "REQUEST",
+                "family": "jobIdUpload",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "33": {
+                "text": "33 - jobDataUpload",
+                "typeRequest": "REQUEST",
+                "family": "jobDataUpload",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "35": {
+                "text": "35 - jobInfo",
+                "typeRequest": "SUBSCRIBE",
+                "family": "jobInfo",
+                "implemented": true,
+                "revisions": [1, 2, 3, 4, 5],
+                "params": []
+            },
+            "38": {
+                "text": "38 - selectJob",
+                "typeRequest": "COMMAND",
+                "family": "selectJob",
+                "implemented": true,
+                "revisions": [2, 1],
+                "params": {
+                    "1": [{"name": "jobID", "type": "number", "desc": "0 - 99"}],
+                    "2": [{"name": "jobID", "type": "number", "desc": "0 - 9999"}]
+                }
+            },
+            "39": {
+                "text": "39 - jobRestart",
+                "typeRequest": "COMMAND",
+                "family": "jobRestart",
+                "implemented": true,
+                "revisions": [2, 1],
+                "params": {
+                    "1": [{"name": "jobID", "type": "number", "desc": "0 - 99"}],
+                    "2": [{"name": "jobID", "type": "number", "desc": "0 - 9999"}]
+                }
+            },
+            "41": {
+                "text": "41 - toolDataUpload",
+                "typeRequest": "REQUEST",
+                "family": "toolDataUpload",
+                "implemented": true,
+                "revisions": [1, 2, 3, 4, 5],
+                "params": []
+            },
+            "42": {
+                "text": "42 - disableTool",
+                "typeRequest": "COMMAND",
+                "family": "disableTool",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "43": {
+                "text": "43 - enableTool",
+                "typeRequest": "COMMAND",
+                "family": "enableTool",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "44": {
+                "text": "44 - disconnectTool",
+                "typeRequest": "COMMAND",
+                "family": "disconnectTool",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "45": {
+                "text": "45 - setCalibrationValue",
+                "typeRequest": "COMMAND",
+                "family": "setCalibrationValue",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "46": {
+                "text": "46 - setPrimaryTool",
+                "typeRequest": "COMMAND",
+                "family": "setPrimaryTool",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "47": {
+                "text": "47 - toolPairingHandling",
+                "typeRequest": "COMMAND",
+                "family": "toolPairingHandling",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "50": {
+                "text": "50 - vinDownload",
+                "typeRequest": "COMMAND",
+                "family": "vinDownload",
+                "implemented": true,
+                "revisions": [1],
+                "params": {"1": [{"name": "numberVIN", "type": "string", "desc": "25 ASCII characters"}]}
+            },
+            "52": {
+                "text": "52 - vin",
+                "typeRequest": "SUBSCRIBE",
+                "family": "vin",
+                "implemented": true,
+                "revisions": [2, 1],
+                "params": []
+            },
+            "61": {
+                "text": "61 - lastTightening",
+                "typeRequest": "SUBSCRIBE",
+                "family": "lastTightening",
+                "implemented": true,
+                "revisions": [7, 6, 5, 4, 3, 2, 1],
+                "params": []
+            },
+            "65": {
+                "text": "65 - oldTighteningResultUpload",
+                "typeRequest": "REQUEST",
+                "family": "oldTighteningResultUpload",
+                "implemented": true,
+                "revisions": [7, 6, 5, 4, 3, 2, 1],
+                "params": {
+                    "1": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}],
+                    "2": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}],
+                    "3": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}],
+                    "4": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}],
+                    "5": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}],
+                    "6": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}],
+                    "7": [{"name": "tighteningID", "type": "string", "desc": "10 ASCII digits"}]
+                }
+            },
+            "71": {
+                "text": "71 - alarm",
+                "typeRequest": "SUBSCRIBE",
+                "family": "alarm",
+                "implemented": true,
+                "revisions": [2, 1],
+                "params": []
+            },
+            "81": {
+                "text": "81 - readTimeUpload",
+                "typeRequest": "REQUEST",
+                "family": "readTimeUpload",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "82": {
+                "text": "82 - setTime",
+                "typeRequest": "COMMAND",
+                "family": "setTime",
+                "implemented": true,
+                "revisions": [1],
+                "params": {
+                    "1": [{
+                        "name": "time",
+                        "type": "string",
+                        "desc": "19 ASCII characters: YYYY-MM-DD:HH:MM:SS",
+                        "rev": [1]
+                    }]
+                }
+            },
+            "91": {
+                "text": "91 - multiSpindleStatus",
+                "typeRequest": "SUBSCRIBE",
+                "family": "multiSpindleStatus",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "101": {
+                "text": "101 - multiSpindleResult",
+                "typeRequest": "SUBSCRIBE",
+                "family": "multiSpindleResult",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "106": {
+                "text": "106 - lastPowerMACSTighteningResultStationData",
+                "typeRequest": "SUBSCRIBE",
+                "family": "lastPowerMACSTighteningResultStationData",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "110": {
+                "text": "110 - displayUserTextOnCompact",
+                "typeRequest": "COMMAND",
+                "family": "displayUserTextOnCompact",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "111": {
+                "text": "111 - displayUserTextOnGraph",
+                "typeRequest": "COMMAND",
+                "family": "displayUserTextOnGraph",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "113": {
+                "text": "113 - flashGreenLightOnTool",
+                "typeRequest": "COMMAND",
+                "family": "flashGreenLightOnTool",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "121": {
+                "text": "121 - jobLineControl",
+                "typeRequest": "SUBSCRIBE",
+                "family": "jobLineControl",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "127": {
+                "text": "127 - abortJob",
+                "typeRequest": "COMMAND",
+                "family": "abortJob",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "128": {
+                "text": "128 - jobBatchIncrement",
+                "typeRequest": "COMMAND",
+                "family": "jobBatchIncrement",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "129": {
+                "text": "129 - jobBatchDecrement",
+                "typeRequest": "COMMAND",
+                "family": "jobBatchDecrement",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "130": {
+                "text": "130 - jobOff",
+                "typeRequest": "COMMAND",
+                "family": "jobOff",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "131": {
+                "text": "131 - setJobLineControlStart",
+                "typeRequest": "COMMAND",
+                "family": "setJobLineControlStart",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "132": {
+                "text": "132 - setJobLineAlert1",
+                "typeRequest": "COMMAND",
+                "family": "setJobLineAlert1",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "133": {
+                "text": "133 - setJobLineAlert2",
+                "typeRequest": "COMMAND",
+                "family": "setJobLineAlert2",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "140": {
+                "text": "140 - executeDynamicJob",
+                "typeRequest": "COMMAND",
+                "family": "executeDynamicJob",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "150": {
+                "text": "150 - identifierDownload",
+                "typeRequest": "COMMAND",
+                "family": "identifierDownload",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "152": {
+                "text": "152 - multipleIdentifierResultParts",
+                "typeRequest": "SUBSCRIBE",
+                "family": "multipleIdentifierResultParts",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "155": {
+                "text": "155 - bypassIdentifier",
+                "typeRequest": "COMMAND",
+                "family": "bypassIdentifier",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "156": {
+                "text": "156 - resetLatestIdentifier",
+                "typeRequest": "COMMAND",
+                "family": "resetLatestIdentifier",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "157": {
+                "text": "157 - resetAllIdentifiers",
+                "typeRequest": "COMMAND",
+                "family": "resetAllIdentifiers",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "200": {
+                "text": "200 - setExternallyControlledRelays",
+                "typeRequest": "COMMAND",
+                "family": "setExternallyControlledRelays",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "211": {
+                "text": "211 - statusExternallyMonitoredInputs",
+                "typeRequest": "SUBSCRIBE",
+                "family": "statusExternallyMonitoredInputs",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "215": {
+                "text": "215 - ioDeviceStatus",
+                "typeRequest": "REQUEST",
+                "family": "ioDeviceStatus",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "217": {
+                "text": "217 - relayFunction",
+                "typeRequest": "SUBSCRIBE",
+                "family": "relayFunction",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "221": {
+                "text": "221 - digitalInputFunction",
+                "typeRequest": "SUBSCRIBE",
+                "family": "digitalInputFunction",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "224": {
+                "text": "224 - setDigitalInputFunction",
+                "typeRequest": "COMMAND",
+                "family": "setDigitalInputFunction",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "225": {
+                "text": "225 - resetDigitalInputFunction",
+                "typeRequest": "COMMAND",
+                "family": "resetDigitalInputFunction",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "240": {
+                "text": "240 - userDataDownload",
+                "typeRequest": "COMMAND",
+                "family": "userDataDownload",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "242": {
+                "text": "242 - userData",
+                "typeRequest": "SUBSCRIBE",
+                "family": "userData",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "245": {
+                "text": "245 - userDataDownloadWithOffset",
+                "typeRequest": "COMMAND",
+                "family": "userDataDownloadWithOffset",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "251": {
+                "text": "251 - selectorSocketInfo",
+                "typeRequest": "SUBSCRIBE",
+                "family": "selectorSocketInfo",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "254": {
+                "text": "254 - selectorControlGreenLights",
+                "typeRequest": "COMMAND",
+                "family": "selectorControlGreenLights",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "255": {
+                "text": "255 - selectorControlRedLights",
+                "typeRequest": "COMMAND",
+                "family": "selectorControlRedLights",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "262": {
+                "text": "262 - toolTagID",
+                "typeRequest": "REQUEST",
+                "family": "toolTagID",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "270": {
+                "text": "270 - controllerReboot",
+                "typeRequest": "COMMAND",
+                "family": "controllerReboot",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "301": {
+                "text": "301 - histogramUpload",
+                "typeRequest": "REQUEST",
+                "family": "histogramUpload",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "401": {
+                "text": "401 - automaticManualMode",
+                "typeRequest": "SUBSCRIBE",
+                "family": "automaticManualMode",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "411": {
+                "text": "411 - autoDisableSettings",
+                "typeRequest": "REQUEST",
+                "family": "autoDisableSettings",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "421": {
+                "text": "421 - openProtocolCommandsDisabled",
+                "typeRequest": "SUBSCRIBE",
+                "family": "openProtocolCommandsDisabled",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "501": {
+                "text": "501 - motorTuningResultData",
+                "typeRequest": "SUBSCRIBE",
+                "family": "motorTuningResultData",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "504": {
+                "text": "504 - motorTuning",
+                "typeRequest": "COMMAND",
+                "family": "motorTuning",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "2100": {
+                "text": "2100 - deviceCommand",
+                "typeRequest": "COMMAND",
+                "family": "deviceCommand",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "2502": {
+                "text": "2502 - passwordRequest",
+                "typeRequest": "COMMAND",
+                "family": "passwordRequest",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "2503": {
+                "text": "2503 - passwordResponse",
+                "typeRequest": "COMMAND",
+                "family": "passwordResponse",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "2505": {
+                "text": "2505 - selectParameterSetDynamically",
+                "typeRequest": "COMMAND",
+                "family": "selectParameterSetDynamically",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "2601": {
+                "text": "2601 - modeIdUpload",
+                "typeRequest": "REQUEST",
+                "family": "modeIdUpload",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            },
+            "2603": {
+                "text": "2603 - modeDataUpload",
+                "typeRequest": "REQUEST",
+                "family": "modeDataUpload",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "2606": {
+                "text": "2606 - selectMode",
+                "typeRequest": "COMMAND",
+                "family": "selectMode",
+                "implemented": false,
+                "revisions": [1],
+                "params": []
+            },
+            "9999": {
+                "text": "9999 - keepAlive",
+                "typeRequest": "REQUEST",
+                "family": "keepAlive",
+                "implemented": true,
+                "revisions": [1],
+                "params": []
+            }
+        };
+        //__AUTO__GENERATED__
+
+        RED.nodes.registerType('op node', {
+            category: 'advanced',
+            color: '#50D3EF',
+            defaults: {
+                name: {
+                    value: ""
+                },
+                config: {
+                    value: "",
+                    type: "op config"
+                },
+                midGroup: {
+                    value: "",
+                    required: true
+                },
+                customMid: {
+                    value: ""
+                },
+                revision: {
+                    value: "",
+                    required: true
+                },
+                customRevision: {
+                    value: ""
+                },
+                autoSubscribe: {
+                    value: true
+                },
+                forwardErrors: {
+                    value: false
+                },
+                outputs: {
+                    value: 1
+                }
+            },
+            inputs: 1,
+            outputs: 1,
+            icon: "wrench.png",
+            paletteLabel: "open protocol",
+            outputLabels: function (index) {
+
+                // TODO: Estudar melhores labels
+
+                if (index === 0) {
+                    return this._("open-protocol.util.label.feedback");
+                }
+
+                if (index === 1) {
+                    return this._("open-protocol.util.label.data");
+                }
+
+                if (index === 2) {
+                    return this._("open-protocol.util.label.status-alarm");
+                }
+
+                if (index === 3) {
+                    return this._("open-protocol.util.label.ack-alarm");
+                }
+
+            },
+            label: function () {
+
+                if (this.name) {
+                    return this.name;
+                }
+
+                var name = "";
+
+                if (!this.midGroup) {
+                    return this._("open-protocol.util.label.node");
+                }
+
+                if (this.midGroup === "Connect") {
+                    name = this._("open-protocol.util.label.connect");
+                }
+
+                if (this.midGroup === "Custom") {
+                    name = this._("open-protocol.util.label.custom");
+                }
+
+                if (name === "") {
+                    name = base[this.midGroup].family;
+                }
+
+                var selectConfig = RED.nodes.node(this.config);
+
+                if (selectConfig) {
+                    name = selectConfig.label() + ": " + name;
+                }
+
+                return name;
+            },
+            labelStyle: function () {
+                return this.name ? "node_label_italic" : "";
+            },
+            oneditprepare: function () {
+
+                let base_midGroup = Object.keys(base);
+
+                let node = this;
+
+                const select_midGroup = $("#node-input-midGroup");
+                const select_revision = $("#node-input-revision");
+
+                atualizaMidGroup();
+
+                // --- Changes
+                select_midGroup.change(() => {
+                    controlaInterface();
+                    atualizaOutputs();
+                    atualizaRevision();
+                    select_revision.change();
+                });
+
+                select_revision.change(() => {
+                    controlaInterface();
+                    atualizaTips();
+                });
+
+                // --- Changes
+
+
+                // --- <Begin> -- Functions ---
+
+                function atualizaMidGroup() {
+
+                    let subCategories = {
+                        "SUBSCRIBE": $('<optgroup>').prop('label', 'Subscriptions'),
+                        "REQUEST": $('<optgroup>').prop('label', 'Requests'),
+                        "COMMAND": $('<optgroup>').prop('label', 'Commands'),
+                        "CONTROL": $('<optgroup>').prop('label', 'Controls')
+                    };
+
+                    base_midGroup.forEach(item => {
+
+                        //issue #2 - Remove MidGroups 3 e 9999
+                        if (item === '3' || item === '9999') {
+                            return;
+                        }
+
+                        let option = $(`<option>`).val(item).text(base[item].text);
+                        subCategories[base[item].typeRequest].append(option);
+                    });
+
+                    subCategories["CONTROL"].append($(`<option>`).val("Connect").text("Connection"));
+                    subCategories["CONTROL"].append($(`<option>`).val("Custom").text("Custom MID"));
+
+                    select_midGroup.append(subCategories["SUBSCRIBE"]);
+                    select_midGroup.append(subCategories["REQUEST"]);
+                    select_midGroup.append(subCategories["COMMAND"]);
+                    select_midGroup.append(subCategories["CONTROL"]);
+
+                    if (node.midGroup) {
+                        select_midGroup.val(node.midGroup);
+                    }
+
+                    if (select_midGroup.val() === "") {
+                        select_midGroup.val("15");
+                    }
+                }
+
+                function atualizaRevision() {
+
+                    let localMidGroup = select_midGroup.val();
+
+                    if (!localMidGroup || localMidGroup === "Custom" || localMidGroup === "Connect") {
+                        return;
+                    }
+
+                    let detalhes = base[localMidGroup];
+                    let base_revisions = detalhes.revisions;
+
+                    select_revision.find("option").remove().end();
+
+                    if (detalhes.params.length === 0) {
+                        if (node.revision === "Auto") {
+                            select_revision.append($(`<option>`).val("Auto").text("Auto"));
+                            select_revision.val("Auto");
+                        } else {
+                            select_revision.append($(`<option>`).val("Auto").text("Auto"));
+                        }
+                    }
+
+                    base_revisions.forEach(item => {
+                        let option = $(`<option>`).val(item.toString()).text(item);
+                        select_revision.append(option);
+
+                        if (node.revision === item.toString()) {
+                            select_revision.val(item.toString());
+                        }
+                    });
+
+                    if (node.revision === "Custom") {
+                        select_revision.append($("<option>").val("Custom").text("Custom"));
+                        select_revision.val("Custom");
+                    } else {
+                        select_revision.append($("<option>").val("Custom").text("Custom"));
+                    }
+
+                    if (!base_revisions.includes(Number(node.revision)) && node.revision !== "Custom") {
+                        node.revision = undefined;
+                    }
+
+                    if (select_revision.val() === "") {
+                        select_revision.val("Auto");
+                    }
+
+                    if (select_revision.val() === "") {
+                        select_revision.val("1");
+                    }
+                }
+
+                function controlaInterface() {
+
+                    let localMidGroup = select_midGroup.val();
+                    let localRevision = select_revision.val();
+
+                    const div_customMid = $("#div-custom-mid");
+                    const div_revision = $("#div-revision");
+                    const div_customRevision = $("#div-custom-revision");
+                    const div_autoSubscribe = $("#div-auto-subscribe");
+                    const div_forwardErrors = $("#div-forward-errors");
+                    const div_tips = $("#div-tips");
+
+                    div_customMid.hide();
+                    div_revision.hide();
+                    div_customRevision.hide();
+                    div_autoSubscribe.hide();
+                    div_tips.hide();
+
+                    if (!localMidGroup) {
+                        return;
+                    }
+
+                    if (localMidGroup === "Connect") {
+                        div_tips.show();
+                        return;
+                    }
+
+                    if (localMidGroup === "Custom") {
+                        div_tips.show();
+                        return;
+                    }
+
+                    if (localRevision === "Custom") {
+                        div_revision.show();
+                        div_customRevision.show();
+                        return;
+                    }
+
+                    let detalhes = base[localMidGroup];
+
+                    if (detalhes.implemented && detalhes.typeRequest === "SUBSCRIBE" && detalhes.params
+                        .length === 0) {
+                        div_autoSubscribe.show();
+                    }
+
+                    div_revision.show();
+
+                    if (localRevision) {
+                        div_tips.show();
+                    }
+                }
+
+                function atualizaTips() {
+
+                    let codeInfo = $("#code-info");
+                    let localMidGroup = select_midGroup.val();
+                    let localRevision = select_revision.val();
+
+                    if (!localMidGroup) {
+                        return;
+                    }
+
+                    if (localMidGroup === "Connect") {
+                        let content = node._("open-protocol.tips.connect");
+                        codeInfo.html(content);
+                        return;
+                    }
+
+                    if (localMidGroup === "Custom") {
+                        let content = node._("open-protocol.tips.custom");
+                        codeInfo.html(content);
+                        return;
+                    }
+
+                    let detalhes = base[localMidGroup];
+
+                    let content = "";
+
+                    if (!detalhes.implemented) {
+                        content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
+                            node._("open-protocol.tips.not-implemented");
+
+                        codeInfo.html(content);
+                        return;
+                    }
+
+                    if (detalhes.params.length === 0 && detalhes.typeRequest !== "SUBSCRIBE") {
+
+                        content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
+                            node._("open-protocol.tips.not-params");
+
+                        codeInfo.html(content);
+                        return;
+
+                    }
+
+                    if (detalhes.params.length === 0 && detalhes.typeRequest === "SUBSCRIBE") {
+
+                        content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
+                            node._("open-protocol.tips.subscribe");
+
+                        codeInfo.html(content);
+                        return;
+                    }
+
+                    if (localRevision && localRevision !== "Auto" && localRevision !== "Custom") {
+
+                        content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
+                            node._("open-protocol.tips.params.header") +
+                            `<h6>Revision: ${localRevision} </h6>` +
+                            "<code>msg.payload = {}<\/code><br>";
+
+                        detalhes.params[localRevision].forEach((value) => {
+
+                            let param = node._("open-protocol.tips.params.tags.param");
+                            let type = node._("open-protocol.tips.params.tags.type");
+                            let desc = node._("open-protocol.tips.params.tags.description");
+
+                            let local = "<blockquote>" +
+                                `${param}: <code>msg.payload.${value.name}</code> <br>` +
+                                `${type}: <code>${value.type}</code> <br>` +
+                                `${desc}: ${value.desc}</blockquote>`;
+
+                            content = content.concat(local);
+
+                        });
+
+                        codeInfo.html(content);
+                        return;
+                    }
+                    codeInfo.html("");
+                }
+
+                function atualizaOutputs() {
+
+                    let localMidGroup = select_midGroup.val();
+
+                    if (!localMidGroup) {
+                        return;
+                    }
+
+                    if (localMidGroup === "Custom") {
+                        node.outputs = 1;
+                        return;
+                    }
+
+                    if (localMidGroup === "Connect") {
+                        node.outputs = 1;
+                        return;
+                    }
+
+                    if (localMidGroup === "71") {
+                        node.outputs = 4;
+                        return;
+                    }
+
+                    let typeRequest = base[localMidGroup].typeRequest;
+
+                    if (typeRequest === "SUBSCRIBE") {
+                        node.outputs = 2;
+                    } else {
+                        node.outputs = 1;
+                    }
+                }
+
+                // --- <End> -- Functions ---
+            }
+        });
+
+    })();
+</script>
+
+<!-- --< End >--------- OpenProtocol Node (op node) ---------------------- -->
