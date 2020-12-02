@@ -1,0 +1,15 @@
+{
+    "focas":{
+        "endpoint": {
+            "status": {
+                "online": "online",
+                "offline":"offline",
+                "connecting": "connecting",
+                "unknown": "unknown"
+            }
+        },
+        "functions": {
+            "unknown": "ERR_UN_FN - An unknown function was called"
+        }
+    }
+}

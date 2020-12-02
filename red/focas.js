@@ -14,7 +14,7 @@ module.exports = function (RED) {
         var obj;
 
         if (typeof val != 'string' && typeof val != 'number' && typeof val != 'boolean') {
-            val = RED._("s7.endpoint.status.online");
+            val = RED._("focas.endpoint.status.online");
         }
 
         switch (status) {
@@ -25,32 +25,25 @@ module.exports = function (RED) {
                     text: val.toString()
                 };
                 break;
-            case 'badvalues':
-                obj = {
-                    fill: 'yellow',
-                    shape: 'dot',
-                    text: RED._("s7.endpoint.status.badvalues")
-                };
-                break;
             case 'offline':
                 obj = {
                     fill: 'red',
                     shape: 'dot',
-                    text: RED._("s7.endpoint.status.offline")
+                    text: RED._("focas.endpoint.status.offline")
                 };
                 break;
             case 'connecting':
                 obj = {
                     fill: 'yellow',
                     shape: 'dot',
-                    text: RED._("s7.endpoint.status.connecting")
+                    text: RED._("focas.endpoint.status.connecting")
                 };
                 break;
             default:
                 obj = {
                     fill: 'grey',
                     shape: 'dot',
-                    text: RED._("s7.endpoint.status.unknown")
+                    text: RED._("focas.endpoint.status.unknown")
                 };
         }
         return obj;
@@ -244,11 +237,14 @@ module.exports = function (RED) {
             let params = (msg.payload)? msg.payload : null;
 
             switch(fn){
-                case 'cncStatInfo': 
+                case '01': 
                     node.endpoint.focas.cncStatInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
+                default:
+                    RED._("focas.function.unknown");
+                    sendMsg(new Error(RED._("focas.function.unknown")), null, null);
             }
         };
 
