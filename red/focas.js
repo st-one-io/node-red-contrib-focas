@@ -4,100 +4,130 @@
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
 
-const openProtocol = require('node-open-protocol');
-const base = require('../base.json');
-const {
-    EventEmitter
-} = require('events');
+const Focas = require('focas-library');
+const {EventEmitter} = require('events');
 
 
 module.exports = function (RED) {
+    // ----------- Focas Endpoint -----------
+    function generateStatus(status, val) {
+        var obj;
+
+        if (typeof val != 'string' && typeof val != 'number' && typeof val != 'boolean') {
+            val = RED._("s7.endpoint.status.online");
+        }
+
+        switch (status) {
+            case 'online':
+                obj = {
+                    fill: 'green',
+                    shape: 'dot',
+                    text: val.toString()
+                };
+                break;
+            case 'badvalues':
+                obj = {
+                    fill: 'yellow',
+                    shape: 'dot',
+                    text: RED._("s7.endpoint.status.badvalues")
+                };
+                break;
+            case 'offline':
+                obj = {
+                    fill: 'red',
+                    shape: 'dot',
+                    text: RED._("s7.endpoint.status.offline")
+                };
+                break;
+            case 'connecting':
+                obj = {
+                    fill: 'yellow',
+                    shape: 'dot',
+                    text: RED._("s7.endpoint.status.connecting")
+                };
+                break;
+            default:
+                obj = {
+                    fill: 'grey',
+                    shape: 'dot',
+                    text: RED._("s7.endpoint.status.unknown")
+                };
+        }
+        return obj;
+    }
 
     // <Begin> --- Config ---
-    function OpenProtocolConfig(values) {
+    function FocasConfig(values) {
 
         EventEmitter.call(this);
         RED.nodes.createNode(this, values);
 
         let node = this;
 
-        node.controllerIP = values.controllerIP;
-        node.controllerPort = Number(values.controllerPort);
+        node.machineIP = values.machineIP;
+        node.machinePort = Number(values.machinePort);
         node.keepAlive = values.keepAlive;
         node.timeout = values.timeout;
-        node.retries = values.retries;
-        node.rawData = values.rawData;
-        node.genericMode = values.generic;
-        node.forceLinkLayer = values.linkLayer;
-        node.disablemidparsing = values.disablemidparsing;
-
+        //node.machine = values.machine;
+        node.logLevel = values.logLevel;
+        node.libBuild = null;
         node.userDisconnect = false;
         node.onClose = false;
 
-        let parsingDisable = {};
+        node.connectionStatus = 'offline';
 
-        node.disablemidparsing.split(/[,; ]+/).map((item) => {
-            return Number(item);
-        }).forEach((elm) => {
-            parsingDisable[elm] = true;
-        });
-
-        if (node.forceLinkLayer === 'false') {
-            node.forceLinkLayer = false;
-        } else {
-            if (node.forceLinkLayer === 'true') {
-                node.forceLinkLayer = true;
-            } else {
-                node.forceLinkLayer = undefined;
-            }
+        switch (node.machine) {
+            case '0i':
+            default:
+                node.libBuild = '_focas_fs0idd';
         }
 
-        let opts = {
-            linkLayerActivate: node.forceLinkLayer,
-            genericMode: node.genericMode,
-            keepAlive: Number(node.keepAlive),
-            rawData: node.rawData,
-            timeOut: Number(node.timeout),
-            retryTimes: Number(node.retries),
-            disableMidParsing: parsingDisable
-        };
+        node.connect = async function connect() {
 
-        node.connectionStatus = false;
-
-        node.connect = function connect() {
-
-            if (node.connectionStatus) {
+            if (node.connectionStatus == 'online') {
                 return;
             }
 
             clearTimeout(node.timerReconnect);
 
-            node.op = openProtocol.createClient(node.controllerPort, node.controllerIP, opts, (data) => node.onConnect(data));
-            node.op.on("error", (err) => node.onErrorOP(err));
+            node.focas = new Focas(node.libBuild, node.machineIP, node.machinePort, node.timeout, node.logLevel);
+            await node.focas.connect();
+            
+            node.focas.on("error", (err) => node.onError(err));
+            node.focas.on("connected", () => node.onConnect);
+            node.focas.on("disconnected", () => node.onDisconnect);
+            
         };
 
         node.connect();
 
-        node.onConnect = function onConnect(data) {
+        node.manageStatus = function manageStatus(newStatus) {
+            if (node.connectionStatus == newStatus) return;
+
+            node.connectionStatus = newStatus;
+            node.emit('__STATUS__', {
+                status: node.connectionStatus
+            });
+        }
+
+        node.onConnect = function onConnect() {
 
             clearTimeout(node.timerReconnect);
 
-            node.connectionStatus = true;
-
-            node.op.on("__SubscribeData__", (data) => node.onSubscribeDataOP(data));
-            node.op.on("close", (error) => node.onCloseOP(error));
-            node.op.on("connect", (data) => node.onConnectOP(data));
-            node.op.on("data", (data) => node.onDataOP(data));
-            node.emit("connect", data);
+            node.manageStatus('online');
         };
+
+        node.onDisconnect = function onDisconnect() {
+
+        }
 
         node.disconnect = function disconnect() {
 
-            node.removeListenersOP();
+            node.removeListener();
 
-            node.op.close();
+            node.focas.destroy();
 
-            node.connectionStatus = false;
+            node.manageStatus('offline');
             node.emit("disconnect");
 
             node.userDisconnect = true;
@@ -107,65 +137,59 @@ module.exports = function (RED) {
 
             clearTimeout(node.timerReconnect);
 
-            if (node.onClose || node.userDisconnect || node.connectionStatus) {
+            if (node.onClose || node.userDisconnect || (node.connectionStatus == 'online')) {
                 return;
             }
 
             node.connect();
         };
 
+        node.getStatus = function getStatus() {
+            return node.connectionStatus;
+        }
+
         // Begin::Event of Session Control Client - Open Protocol
-        node.onErrorOP = function onErrorOP(error) {
+        node.onError = function onError(error) {
 
             if (node.onClose) {
                 return;
             }
 
-            node.connectionStatus = false;
+            node.manageStatus('offline');
 
             node.emit("disconnect");
 
             node.error(`${RED._("open-protocol.message.failed-connect")} ${error.address}:${error.port} ${error.code}`);
 
-            node.removeListenersOP();
+            node.removeListeners();
 
             clearTimeout(node.timerReconnect);
             node.timerReconnect = setTimeout(() => node.reconnect(), 5000);
         };
 
-        node.onCloseOP = function onCloseOP(error) {
+        node.onClose = function onClose(error) {
 
             if (node.onClose) {
                 return;
             }
 
-            node.connectionStatus = false;
+            node.manageStatus('offline');
             node.emit("disconnect");
 
-            node.removeListenersOP();
+            node.removeListeners();
 
             clearTimeout(node.timerReconnect);
             node.timerReconnect = setTimeout(() => node.reconnect(), 5000);
         };
 
-        node.onConnectOP = function onConnectOP(data) {
+        node.onConnect = function onConnect(data) {
             node.emit("connect", data);
         };
 
-        node.onDataOP = function onDataOP(data) {
-            node.emit("data", data);
-        };
-
-        node.onSubscribeDataOP = function onSubscribeDataOP(data) {
-            node.emit(data.key, data.data);
-        };
-
-        node.removeListenersOP = function removeListenersOP() {
-            node.op.removeListener("error", (err) => node.onErrorOP(err));
-            node.op.removeListener("__SubscribeData__", (data) => node.onSubscribeDataOP(data));
-            node.op.removeListener("close", (error) => node.onCloseOP(error));
-            node.op.removeListener("connect", (data) => node.onConnectOP(data));
-            node.op.removeListener("data", (data) => node.onDataOP(data));
+        node.removeListeners = function removeListeners() {
+            node.focas.removeListener("error", (err) => node.onError(err));
+            node.focas.removeListener("connected", (data) => node.onConnect(data));
+            node.focas.removeListener("disconnected", (data) => node.onDisconnect(data));
         };
         // End::Event of Session Control Client - Open Protocol
 
@@ -174,313 +198,71 @@ module.exports = function (RED) {
             node.onClose = true;
             clearTimeout(node.timerReconnect);
 
-            node.removeListenersOP();
+            node.removeListeners();
 
-            node.connectionStatus = false;
+            node.manageStatus('offline')
             node.emit("disconnect");
-            node.op.close();
+            node.focas.destroy();
 
         });
     }
 
-    RED.nodes.registerType("op config", OpenProtocolConfig);
+    RED.nodes.registerType("op config", FocasConfig);
     // <End> --- Config
 
     // <Begin> --- Node
-    function OpenProtocolNode(values) {
+    function FocasNode(config) {
 
-        RED.nodes.createNode(this, values);
+        RED.nodes.createNode(this, config);
 
         let node = this;
+        var statusVal;
+        node.endpoint = RED.nodes.getNode(config.endpoint);
 
-        node.config = RED.nodes.getNode(values.config);
-
-        node.midGroup = values.midGroup;
-        node.customMid = values.customMid;
-        node.revision = values.revision;
-        node.customRevision = values.customRevision;
-        node.autoSubscribe = values.autoSubscribe;
-        node.forwardErrors = values.forwardErrors;
-
-        node.config.on("connect", (data) => node.onConnect(data));
-        node.config.on("disconnect", () => node.onDisconnect());
-
-        node.onConnect = function onConnect(data) {
-
-            node.status({
-                fill: "green",
-                shape: "ring",
-                text: RED._("open-protocol.util.label.connected")
-            });
-
-            if (node.midGroup === "Connect") {
-                let message = {};
-                message.payload = data.payload;
-                setMessage(message, data);
-                node.send(message);
-            }
-
-            if (base[node.midGroup]) {
-                if (node.autoSubscribe && base[node.midGroup].typeRequest === "SUBSCRIBE") {
-                    onInput(node, {});
-                }
-            }
-        };
-
-        node.onDisconnect = function onDisconnect() {
-            node.status({
-                fill: "red",
-                shape: "ring",
-                text: RED._("open-protocol.util.label.disconnected")
-            });
-
-            if (base[node.midGroup]) {
-                let reference = base[node.midGroup];
-                node.config.removeListener(reference.family, node.onSubscribe);
-            }
-        };
-
-        node.onData = function onData(data) {
-            let message = {};
-            message.payload = data.payload;
-            setMessage(message, data);
-
-            if (node.midGroup === "Custom") {
-                node.send(message);
-            } else {
-                node.send([null, message]);
-            }
-
-        };
-
-        node.onSubscribe = function onSubscribe(data) {
-            let message = {};
-            message.payload = data.payload;
-            setMessage(message, data);
-
-            //Alarm MID  ->> [Feedback, Data, Status, ACK]
-            if (node.midGroup === 71) {
-
-                if (data.mid === 71) {
-                    //Data
-                    node.send([null, message, null, null]);
-                    return;
-                }
-
-                if (data.mid === 76) {
-                    //Status
-                    node.send([null, null, message, null]);
-                    return;
-                }
-
-                if (data.mid === 74) {
-                    //ACK
-                    node.send([null, null, null, message]);
-                    return;
-                }
-
-            } else {
-                node.send([null, message]);
-            }
-        };
-
-        if (node.midGroup === "Custom") {
-            node.config.on("data", (data) => node.onData(data));
+        node.onEndpointStatus = function onEndpointStatus(s) {
+            node.generateStatus(node.endpoint.getStatus(s.status), statusVal);
         }
 
+        node.status(generateStatus(), statusVal)
+        node.endpoint.on('__STATUS__', node.onEndpointStatus);
+
+
+        function sendMsg(data, key, status) {
+            if(key === undefined ) key = '';
+
+            let msg = {
+                payload: data,
+                topic:key
+            }
+
+            statusVal = status !== undefined ? status: data;
+            node.send(msg);
+        }
+
+        node.callFocas = function callFocas(msg) {
+            let fn = (config.fn) ? config.fn : msg.fn;
+            let params = (msg.payload)? msg.payload : null;
+
+            switch(fn){
+                case 'cncStatInfo': 
+                    node.endpoint.focas.cncStatInfo()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+            }
+        };
 
         node.on("input", (msg) => {
-
-            if (node.midGroup === "Custom") {
-
-                let opts = {
-                    revision: msg.revision,
-                    payload: msg.payload
-                };
-
-                node.config.op.sendMid(msg.mid, opts)
-                    .catch(err => {
-
-                        msg.error = err.stack || err;
-
-                        if (node.forwardErrors) {
-                            node.send([msg, null]);
-                        }
-
-                        node.error(`${RED._("open-protocol.message.error-send-mid")} - ${err}`, msg);
-                    });
-
-                return;
-            }
-
-            if (node.midGroup === "Connect") {
-
-                if (msg.connect != undefined) {
-                    if (msg.connect) {
-                        node.config.connect();
-                    } else {
-                        node.config.disconnect();
-                    }
-                }
-
-                return;
-            }
-
-            onInput(node, msg);
-
+            node.callFocas(msg);
         });
 
         node.on("close", () => {
 
-            node.config.removeListener("connect", (data) => node.onConnect(data));
-            node.config.removeListener("disconnect", () => node.onDisconnect());
-
-            if (base[node.midGroup]) {
-                let reference = base[node.midGroup];
-                node.config.removeListener(reference.family, node.onSubscribe);
-            }
-
-            //Alarm MID
-            if (node.midGroup === 71) {
-                node.config.removeListener("alarmAcknowledged", node.onSubscribe);
-                node.config.removeListener("alarmStatus", node.onSubscribe);
-            }
-
         });
 
-        function onInput(node, msg) {
-
-            let reference = base[node.midGroup];
-            let opts = {};
-            opts.revision = node.revision || msg.revision;
-            opts.revision = node.adjustRevision(opts.revision);
-
-            if (msg.payload) {
-                opts.payload = msg.payload || "";
-            }
-
-            switch (reference.typeRequest) {
-
-                case "REQUEST":
-                    node.config.op.request(reference.family, opts)
-                        .then(data => {
-                            msg.payload = data.payload;
-                            setMessage(msg, data);
-                            node.send(msg);
-                        })
-                        .catch(err => {
-                            msg.error = err.stack || err;
-                            if (node.forwardErrors) {
-                                node.send(msg);
-                            }
-                            node.error(`${RED._("open-protocol.message.error-request")} - ${err}`, msg);
-                        });
-
-                    break;
-
-                case "SUBSCRIBE":
-
-                    if (msg.subscribe !== undefined && !msg.subscribe) {
-
-                        node.config.op.unsubscribe(reference.family)
-                            .then(data => {
-                                msg.payload = data.payload;
-                                setMessage(msg, data);
-                                node.send([msg, null]);
-                                node.config.removeListener(reference.family, node.onSubscribe);
-
-                                //Alarm MID
-                                if (node.midGroup === 71) {
-                                    node.config.removeListener("alarmAcknowledged", node.onSubscribe);
-                                    node.config.removeListener("alarmStatus", node.onSubscribe);
-                                }
-                            })
-                            .catch(err => {
-                                msg.error = err.stack || err;
-                                if (node.forwardErrors) {
-                                    node.send([msg, null]);
-                                }
-                                node.error(`${RED._("open-protocol.message.error-unsubscribe")} - ${err}`, msg);
-                            });
-
-                        return;
-                    }
-
-                    node.config.op.subscribe(reference.family, opts)
-                        .then(data => {
-                            msg.payload = data.payload;
-                            setMessage(msg, data);
-                            node.send([msg, null]);
-
-                            node.config.on(reference.family, node.onSubscribe);
-
-                            //Alarm MID
-                            if (node.midGroup === 71) {
-                                node.config.on("alarmAcknowledged", node.onSubscribe);
-                                node.config.on("alarmStatus", node.onSubscribe);
-                            }
-                        })
-                        .catch(err => {
-                            msg.error = err.stack || err;
-                            if (node.forwardErrors) {
-                                node.send([msg, null]);
-                            }
-
-                            node.error(`${RED._("open-protocol.message.error-subscribe")} - ${err}`, msg);
-                        });
-
-                    break;
-
-                case "COMMAND":
-                    node.config.op.command(reference.family, opts)
-                        .then(data => {
-                            msg.payload = data.payload;
-                            setMessage(msg, data);
-                            node.send(msg);
-                        })
-                        .catch(err => {
-                            msg.error = err.stack || err;
-                            if (node.forwardErrors) {
-                                node.send(msg);
-                            }
-                            node.error(`${RED._("open-protocol.message.error-command")} - ${err}`, msg);
-                        });
-
-                    break;
-            }
-        }
-
-        node.adjustRevision = function adjustRevision(revision) {
-
-            if (revision === "Custom") {
-                return node.customRevision;
-            }
-
-            if (revision === "Auto") {
-                return undefined;
-            }
-
-            return Number(revision);
-        };
-
-        function setMessage(msg, data) {
-
-            msg.mid = data.mid;
-            msg.revision = data.revision;
-            msg.noAck = data.noAck;
-            msg.stationID = data.stationID;
-            msg.spindleID = data.spindleID;
-            msg.sequenceNumber = data.sequenceNumber;
-            msg.messageParts = data.messageParts;
-            msg.messageNumber = data.messageNumber;
-
-            if (node.config.rawData) {
-                msg._rawData = data._raw;
-            }
-        }
     }
 
-    RED.nodes.registerType("op node", OpenProtocolNode);
+    RED.nodes.registerType("op node", FocasNode);
     // <End> --- Node
 
 };
