@@ -11,7 +11,12 @@
             "label": {
                 "ip" : "IP Adress",
                 "port": "Port",
-                "timeout": "Timeout"
+                "timeout": "Timeout",
+                "retries": "Retries",
+                "models": "Model",
+                "options": {
+                    "0id": "0i-D"
+                }
             }
         },
         "endpoint": {

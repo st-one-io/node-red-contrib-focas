@@ -4,7 +4,7 @@
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
 
-const Focas = require('focas-library');
+const Focas = require('../../focas-bindings/focas-endpoint');
 
 module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
@@ -53,12 +53,13 @@ module.exports = function (RED) {
         let reconnect_timeout = 30000;
         let node = this;
 
-        node.machineIP = config.machineIP;
-        node.machinePort = Number(config.machinePort);
-        node.keepAlive = config.keepAlive;
+        node.cncIP = config.cncIP;
+        node.cncPort = Number(config.cncPort);
+        //node.keepAlive = config.keepAlive;
         node.timeout = config.timeout;
-        //node.machine = config.machine;
-        node.logLevel = config.logLevel;
+        node.cncModel = config.cncModel;
+        //node.logLevel = config.logLevel;
+        node.logLevel = 'info'
         node.libBuild = null;
         node.userDisconnect = false;
         node.onClose = false;
@@ -66,8 +67,8 @@ module.exports = function (RED) {
         node.connectionStatus = 'offline';
         node.timerReconnect = null;
 
-        switch (node.machine) {
-            case '0i':
+        switch (node.cncModel) {
+            case '0i-D':
             default:
                 node.libBuild = '_focas_fs0idd';
         }
@@ -79,7 +80,7 @@ module.exports = function (RED) {
 
             clearTimeout(node.timerReconnect);
 
-            node.focas = new Focas(node.libBuild, node.machineIP, node.machinePort, node.timeout, node.logLevel);
+            node.focas = new Focas(node.libBuild, node.cncIP, node.cncPort, node.timeout, node.logLevel);
             await node.focas.connect();
             
             node.focas.on("error", (err) => node.onError(err));

@@ -4,7 +4,7 @@
 -->
 
 <!-- --< Begin >--------- Focas Config (focas config) ---------------------- -->
-<script type="text/x-red" data-template-name="focas config">
+<script type="text/html" data-template-name="focas config">
 
     <div class="form-row">
         <label for="node-config-input-name">
@@ -41,21 +41,19 @@
         <input type="text" id="node-config-input-retries"> times
     </div>
 
-    <!-- <div class="form-row">
+    <div class="form-row">
         <label for="node-config-input-cncModel">
             <i class="fa fa-link"></i>
-            <span data-i18n="focas.config.label.force-link-layer"></span>
+            <span data-i18n="focas.config.label.models"></span>
         </label>
         <select type="text" id="node-config-input-cncModel">
-            <option value="auto" data-i18n="focas.config.label.options.auto"></option>
-            <option value="true" data-i18n="focas.config.label.options.true"></option>
-            <option value="false" data-i18n="focas.config.label.options.false"></option>
+            <option value="0id" data-i18n="focas.config.label.options.0id"></option>
         </select>
-    </div> -->
+    </div>
 
 </script>
 
-<script type="text/x-red" data-help-name="focas config">
+<script type="text/html" data-help-name="focas config">
     <!-- <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
     
     <h3>Options</h3>
@@ -135,9 +133,9 @@
             retries: {
                 value: 3
             },
-            // cncModel: {
-            //     value: "default"
-            // }
+            cncModel: {
+                value: "0id"
+            }
         },
         label: function () {
 
@@ -151,10 +149,10 @@
         },
         oneditprepare: function () {
             $("#node-config-input-timeout").spinner({
-                min: 0
+                min: 3
             });
             $("#node-config-input-retries").spinner({
-                min: 0
+                min: 3
             });
         }
     });
@@ -164,7 +162,7 @@
 
 <!-- --< Begin >--------- Focas Node (focas node) ---------------------- -->
 
-<script type="text/x-red" data-template-name="focas node">
+<script type="text/html" data-template-name="focas node">
 
     <div class="form-row">
         <label for="node-input-config">
@@ -198,14 +196,14 @@
         <input type="text" id="node-input-name" data-i18n="[placeholder]focas.util.label.name">
     </div>
 
-    <div class="form-tips" id="div-tips">
+    <!-- <div class="form-tips" id="div-tips">
         <div id="code-info" style="height:auto; width:90%; font-family: monospace"></div>
-    </div>
+    </div> -->
 
 
 </script>
 
-<script type="text/x-red" data-help-name="focas node">
+<script type="text/html" data-help-name="focas node">
     <!-- <p>Tool communication using OpenProtocol</p>
     <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
 
@@ -312,15 +310,15 @@
                 // forwardErrors: {
                 //     value: false
                 // },
-                outputs: {
-                    value: 1
-                }
+                // outputs: {
+                //     value: 1
+                // }
             },
             inputs: 1,
             outputs: 1,
             icon: "function.svg",
-            paletteLabel: "focas",
-            outputLabels: function (index) {
+            paletteLabel: "FOCAS",
+            //outputLabels: function (index) {
 
                 // TODO: Estudar melhores labels
 
@@ -340,24 +338,19 @@
                 //     return this._("focas.util.label.ack-alarm");
                 // }
 
-            },
+            //},
             label: function () {
 
                 if (this.name) {
                     return this.name;
                 }
 
-                var name = "";
-
-                if (!this.function) {
+                if (this.function) {
+                    return base[this.function].text;
+                } else {
                     return this._("focas.util.label.node");
                 }
-
-                if (name === "") {
-                    name = base[this.function];
-                }
-
-                return name;
+                
             },
             labelStyle: function () {
                 return this.name ? "node_label_italic" : "";
