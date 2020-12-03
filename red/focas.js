@@ -221,11 +221,31 @@ module.exports = function (RED) {
 
         node.callFocas = function callFocas(msg) {
             let fn = (config.fn) ? config.fn : msg.fn;
-            let params = (msg.payload)? msg.payload : null;
+            let params = (msg.payload) ? msg.payload : null;
 
             switch(fn){
                 case '1': 
                     node.endpoint.focas.cncStatInfo()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '2': 
+                    node.endpoint.focas.cncSysInfo()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '3': 
+                    node.endpoint.focas.cncRdProgNum()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '4': 
+                    node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '5': 
+                    node.endpoint.focas.cncRdParam(params.param, params.axis)
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;

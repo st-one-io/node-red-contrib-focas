@@ -293,7 +293,6 @@
                 "text": "3 - cncRdProgNum",
                 "params": []
             },
-
             "4": {
                 "text": "4 - cncRdAxisData",
                 "params": [{"name": "class", 
@@ -309,6 +308,19 @@
                             {"name": "length", 
                             "type": "number", 
                             "desc": "The number of axes to be read."}]
+                            
+            },
+            "5": {
+                "text": "5 - cncRdParam",
+                "params": [{"name": "param", 
+                            "type": "number", 
+                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information"},
+                            {"name": "axis", 
+                            "type": "number", 
+                            "desc": "Specify the axis number.<br>\
+                                     0 : No axis.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes"}]
                             
             }
         };
