@@ -40,7 +40,15 @@
             }
         },
         "tips": {
-            "not-params": "<p>This function does not require additional parameters.<\/p>"
+            "not-params": "<p>This function does not require additional parameters.<\/p>",
+            "params": {
+                "header": "<p>This option does require additional parameters.<\/p> <h5>Parameters<\/h5>",
+                "tags": {
+                    "param": "Param",
+                    "type": "Type",
+                    "description": "Description"
+                }
+            }
         }
     }
 }
