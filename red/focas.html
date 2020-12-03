@@ -47,7 +47,7 @@
             <span data-i18n="focas.config.label.models"></span>
         </label>
         <select type="text" id="node-config-input-cncModel">
-            <option value="0id" data-i18n="focas.config.label.options.0id"></option>
+            <option value="0i-D">0i-D</option>
         </select>
     </div>
 
@@ -136,7 +136,7 @@
                 required: true
             },
             cncModel: {
-                value: "0id",
+                value: "0i-D",
                 required: true
             }
         },
@@ -146,7 +146,7 @@
                 return this.name;
             }
 
-            let name = this.cncIP;
+            let name = this.cncModel + "@" + this.cncIP;
 
             return name;
         },

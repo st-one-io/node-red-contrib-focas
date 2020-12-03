@@ -13,10 +13,7 @@
                 "port": "Port",
                 "timeout": "Timeout",
                 "retries": "Retries",
-                "models": "Model",
-                "options": {
-                    "0id": "0i-D"
-                }
+                "models": "Model"
             }
         },
         "endpoint": {
