@@ -38,6 +38,9 @@
                 "node": "FOCAS",
                 "name": "Name"
             }
+        },
+        "tips": {
+            "not-params": "<p>This function does not require additional parameters.<\/p>"
         }
     }
 }

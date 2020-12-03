@@ -120,7 +120,7 @@
                 value: ""
             },
             cncIP: {
-                value: "",
+                value: "1.1.1.1",
                 required: true
             },
             cncPort: {
@@ -154,6 +154,13 @@
             $("#node-config-input-retries").spinner({
                 min: 3
             });
+        },
+        oneditsave: function () {
+            const select_name = $("#node-config-input-name");
+            
+            if (select_name.val() === "") {
+                select_name.val(node._(`focas.config.label.options.${this.cncModel}`));
+            }
         }
     });
 </script>
@@ -180,14 +187,6 @@
         <select style="width:70%;" id="node-input-function"></select>
     </div>
 
-    <!-- <div class="form-row" id="div-forward-errors">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-forwardErrors" style="display: inline-block; width: auto; vertical-align: top;">
-        <label for="node-input-forwardErrors" style="width:70%;">
-            <span data-i18n="focas.node.label.forward-errors"></span>
-        </label>
-    </div> -->
-
     <div class="form-row">
         <label for="node-input-name">
             <i class="fa fa-tag"></i>
@@ -196,9 +195,9 @@
         <input type="text" id="node-input-name" data-i18n="[placeholder]focas.util.label.name">
     </div>
 
-    <!-- <div class="form-tips" id="div-tips">
+    <div class="form-tips" id="div-tips">
         <div id="code-info" style="height:auto; width:90%; font-family: monospace"></div>
-    </div> -->
+    </div>
 
 
 </script>
@@ -289,7 +288,11 @@
             "1": {
                 "text": "1 - cncStatInfo",
                 "params": []
-            }
+            },
+            "2": {
+                "text": "2 - cncSysInfo",
+                "params": []
+            },
         };
 
         RED.nodes.registerType('focas node', {
@@ -306,39 +309,12 @@
                 function: {
                     value: "",
                     required: true
-                },
-                // forwardErrors: {
-                //     value: false
-                // },
-                // outputs: {
-                //     value: 1
-                // }
+                }
             },
             inputs: 1,
             outputs: 1,
             icon: "function.svg",
             paletteLabel: "FOCAS",
-            //outputLabels: function (index) {
-
-                // TODO: Estudar melhores labels
-
-                // if (index === 0) {
-                //     return this._("focas.util.label.feedback");
-                // }
-
-                // if (index === 1) {
-                //     return this._("focas.util.label.data");
-                // }
-
-                // if (index === 2) {
-                //     return this._("focas.util.label.status-alarm");
-                // }
-
-                // if (index === 3) {
-                //     return this._("focas.util.label.ack-alarm");
-                // }
-
-            //},
             label: function () {
 
                 if (this.name) {
@@ -346,7 +322,8 @@
                 }
 
                 if (this.function) {
-                    return base[this.function].text;
+                    var wordsArr = base[this.function].text.split(" ");
+                    return wordsArr[wordsArr.length - 1];
                 } else {
                     return this._("focas.util.label.node");
                 }
@@ -363,48 +340,21 @@
 
                 const select_function = $("#node-input-function");
 
-                atualizaFunction();
+                updateFunction();
 
                 // --- Changes
-                // select_function.change(() => {
-                //     controlaInterface();
-                //     atualizaOutputs();
-                // });
+                select_function.change(() => {
+                    updateInterface();
+                    updateTips()
+                });
 
                 // --- <Begin> -- Functions ---
 
-                function atualizaFunction() {
-
-                    // let subCategories = {
-                    //     "SUBSCRIBE": $('<optgroup>').prop('label', 'Subscriptions'),
-                    //     "REQUEST": $('<optgroup>').prop('label', 'Requests'),
-                    //     "COMMAND": $('<optgroup>').prop('label', 'Commands'),
-                    //     "CONTROL": $('<optgroup>').prop('label', 'Controls')
-                    // };
-
-                    // base_midGroup.forEach(item => {
-
-                    //     //issue #2 - Remove MidGroups 3 e 9999
-                    //     if (item === '3' || item === '9999') {
-                    //         return;
-                    //     }
-
-                    //     let option = $(`<option>`).val(item).text(base[item].text);
-                    //     subCategories[base[item].typeRequest].append(option);
-                    // });
-
-                    // subCategories["CONTROL"].append($(`<option>`).val("Connect").text("Connection"));
-                    // subCategories["CONTROL"].append($(`<option>`).val("Custom").text("Custom MID"));
+                function updateFunction() {
 
                     base_function.forEach(item => {
                         select_function.append($(`<option>`).val(item).text(base[item].text));
                     });
-                    
-                        
-                    // select_function.append(subCategories["SUBSCRIBE"]);
-                    // select_function.append(subCategories["REQUEST"]);
-                    // select_function.append(subCategories["COMMAND"]);
-                    // select_function.append(subCategories["CONTROL"]);
 
                     if (node.function) {
                         select_function.val(node.function);
@@ -415,169 +365,39 @@
                     }
                 }
 
-                function controlaInterface() {
+                function updateInterface() {
 
-                    // let localMidGroup = select_midGroup.val();
-                    // let localRevision = select_revision.val();
+                    let localFunction = select_function.val();
+                    
+                    const div_tips = $("#div-tips");
 
-                    // const div_customMid = $("#div-custom-mid");
-                    // const div_revision = $("#div-revision");
-                    // const div_customRevision = $("#div-custom-revision");
-                    // const div_autoSubscribe = $("#div-auto-subscribe");
-                    // const div_forwardErrors = $("#div-forward-errors");
-                    // const div_tips = $("#div-tips");
-
-                    // div_customMid.hide();
-                    // div_revision.hide();
-                    // div_customRevision.hide();
-                    // div_autoSubscribe.hide();
-                    // div_tips.hide();
-
-                    // if (!localMidGroup) {
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Connect") {
-                    //     div_tips.show();
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Custom") {
-                    //     div_tips.show();
-                    //     return;
-                    // }
-
-                    // if (localRevision === "Custom") {
-                    //     div_revision.show();
-                    //     div_customRevision.show();
-                    //     return;
-                    // }
-
-                    // let detalhes = base[localMidGroup];
-
-                    // if (detalhes.implemented && detalhes.typeRequest === "SUBSCRIBE" && detalhes.params
-                    //     .length === 0) {
-                    //     div_autoSubscribe.show();
-                    // }
-
-                    // div_revision.show();
-
-                    // if (localRevision) {
-                    //     div_tips.show();
-                    // }
+                    if (!localFunction) {
+                        return;
+                    } else {
+                        div_tips.show();
+                    }
                 }
 
-                function atualizaTips() {
+                function updateTips() {
 
-                    // let codeInfo = $("#code-info");
-                    // let localMidGroup = select_midGroup.val();
-                    // let localRevision = select_revision.val();
+                    let codeInfo = $("#code-info");
+                    let localFunction = select_function.val();
 
-                    // if (!localMidGroup) {
-                    //     return;
-                    // }
+                    if (!localFunction) {
+                        return;
+                    }
 
-                    // if (localMidGroup === "Connect") {
-                    //     let content = node._("focas.tips.connect");
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
+                    let details = base[localFunction];
 
-                    // if (localMidGroup === "Custom") {
-                    //     let content = node._("focas.tips.custom");
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
+                    let content = "";
 
-                    // let detalhes = base[localMidGroup];
+                    if (details.params.length === 0) {
+                        content = `<h4>${details.text}<\/h4>` + node._("focas.tips.not-params");
+                        codeInfo.html(content);
+                        return;
+                    }
 
-                    // let content = "";
-
-                    // if (!detalhes.implemented) {
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.not-implemented");
-
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
-
-                    // if (detalhes.params.length === 0 && detalhes.typeRequest !== "SUBSCRIBE") {
-
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.not-params");
-
-                    //     codeInfo.html(content);
-                    //     return;
-
-                    // }
-
-                    // if (detalhes.params.length === 0 && detalhes.typeRequest === "SUBSCRIBE") {
-
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.subscribe");
-
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
-
-                    // if (localRevision && localRevision !== "Auto" && localRevision !== "Custom") {
-
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.params.header") +
-                    //         `<h6>Revision: ${localRevision} </h6>` +
-                    //         "<code>msg.payload = {}<\/code><br>";
-
-                    //     detalhes.params[localRevision].forEach((value) => {
-
-                    //         let param = node._("focas.tips.params.tags.param");
-                    //         let type = node._("focas.tips.params.tags.type");
-                    //         let desc = node._("focas.tips.params.tags.description");
-
-                    //         let local = "<blockquote>" +
-                    //             `${param}: <code>msg.payload.${value.name}</code> <br>` +
-                    //             `${type}: <code>${value.type}</code> <br>` +
-                    //             `${desc}: ${value.desc}</blockquote>`;
-
-                    //         content = content.concat(local);
-
-                    //     });
-
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
-                    // codeInfo.html("");
-                }
-
-                function atualizaOutputs() {
-
-                    // let localMidGroup = select_midGroup.val();
-
-                    // if (!localMidGroup) {
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Custom") {
-                    //     node.outputs = 1;
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Connect") {
-                    //     node.outputs = 1;
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "71") {
-                    //     node.outputs = 4;
-                    //     return;
-                    // }
-
-                    // let typeRequest = base[localMidGroup].typeRequest;
-
-                    // if (typeRequest === "SUBSCRIBE") {
-                    //     node.outputs = 2;
-                    // } else {
-                    //     node.outputs = 1;
-                    // }
+                    codeInfo.html("");
                 }
 
                 // --- <End> -- Functions ---
