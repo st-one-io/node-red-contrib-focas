@@ -14,9 +14,14 @@
                 "timeout": "Timeout",
                 "retries": "Retries",
                 "models": "Model",
-                "options": {
-                    "0id": "0i-D"
-                }
+                "log": {
+                    "text": "Log Level",
+                    "error": "Error",
+                    "warn": "Warn",
+                    "info": "Info",
+                    "debug": "Debug",
+                    "silly": "Silly"
+                } 
             }
         },
         "endpoint": {
@@ -42,7 +47,15 @@
             }
         },
         "tips": {
-            "not-params": "<p>This function does not require additional parameters.<\/p>"
+            "not-params": "<p>This function does not require additional parameters.<\/p>",
+            "params": {
+                "header": "<p>This option does require additional parameters.<\/p> <h5>Parameters<\/h5>",
+                "tags": {
+                    "param": "Param",
+                    "type": "Type",
+                    "description": "Description"
+                }
+            }
         }
     }
 }
