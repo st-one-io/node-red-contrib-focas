@@ -14,7 +14,14 @@
                 "timeout": "Timeout",
                 "retries": "Retries",
                 "models": "Model",
-                "log": "Log Level"
+                "log": {
+                    "text": "Log Level",
+                    "error": "Error",
+                    "warn": "Warn",
+                    "info": "Info",
+                    "debug": "Debug",
+                    "silly": "Silly"
+                } 
             }
         },
         "endpoint": {
