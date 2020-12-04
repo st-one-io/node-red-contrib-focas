@@ -235,22 +235,22 @@ module.exports = function (RED) {
                     .then((data) => sendMsg(data, null, null))
                     break;
                 case '2': 
-                    node.endpoint.focas.cncSysInfo()
+                    node.endpoint.focas.cncStatInfo2()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
                 case '3': 
-                    node.endpoint.focas.cncRdProgNum()
+                    node.endpoint.focas.cncSysInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
                 case '4': 
-                    node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
+                    node.endpoint.focas.cncSysInfoEx()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
                 case '5': 
-                    node.endpoint.focas.cncRdParam(params.param, params.axis)
+                    node.endpoint.focas.cncSetTimeout(params.timeout)
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
@@ -261,6 +261,41 @@ module.exports = function (RED) {
                     break;
                 case '7': 
                     node.endpoint.focas.cncRelative(params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '8': 
+                    node.endpoint.focas.cncActs()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '9': 
+                    node.endpoint.focas.cncActs2(params.sp_no)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '10': 
+                    node.endpoint.focas.cncActf()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '11': 
+                    node.endpoint.focas.cncAlarm2()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '16': 
+                    node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '18': 
+                    node.endpoint.focas.cncRdParam(params.param, params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '20': 
+                    node.endpoint.focas.cncRdProgNum()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
@@ -275,7 +310,6 @@ module.exports = function (RED) {
         });
 
         node.on("close", () => {
-
         });
 
     }

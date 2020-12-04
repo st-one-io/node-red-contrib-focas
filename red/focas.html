@@ -30,7 +30,7 @@
             <i class="fa fa-clock-o"></i>
             <span data-i18n="focas.config.label.timeout"></span>
         </label>
-        <input type="text" id="node-config-input-timeout"> seconds
+        <input type="text" style="width: 100%;" id="node-config-input-timeout"> seconds
     </div>
 
     <div class="form-row">
@@ -38,7 +38,7 @@
             <i class="fa fa-repeat"></i>
             <span data-i18n="focas.config.label.retries"></span>
         </label>
-        <input type="text" id="node-config-input-retries"> times
+        <input type="text" style="width: 100%;" id="node-config-input-retries"> times
     </div>
 
     <div class="form-row">
@@ -304,15 +304,61 @@
                 "params": []
             },
             "2": {
-                "text": "2 - cncSysInfo",
+                "text": "2 - cncStatInfo2",
                 "params": []
             },
             "3": {
-                "text": "3 - cncRdProgNum",
+                "text": "3 - cncSysInfo",
                 "params": []
             },
             "4": {
-                "text": "4 - cncRdAxisData",
+                "text": "4 - cncSysInfoEx",
+                "params": []
+            },
+            "5": {
+                "text": "5 - cncSetTimeout",
+                "params": [{"name": "timeout", 
+                            "type": "number", 
+                            "desc": "Seconds for timeout. If 0 is specified, timeout is ignored and functions wait infinity."}]
+            },
+            "6": {
+                "text": "6 - cncAbsolute",
+                "params": [{"name": "axis", 
+                            "type": "number", 
+                            "desc": "Axis number to be read.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]  
+            },
+            "7": {
+                "text": "7 - cncRelative",
+                "params": [{"name": "axis", 
+                            "type": "number", 
+                            "desc": "Axis number to be read.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
+            },
+            "8": {
+                "text": "8 - cncActs",
+                "params": []     
+            },
+            "9": {
+                "text": "9 - cncActs2",
+                "params": [{"name": "sp_no", 
+                            "type": "number", 
+                            "desc": "Spindle number to be read.<br>\
+                                     1,...,n : One spindle (n = max. number of spindle).<br>\
+                                     -1 : All spindles."}]        
+            },
+            "10": {
+                "text": "10 - cncActf",
+                "params": []
+            },
+            "11": {
+                "text": "11 - cncAlarm2",
+                "params": []
+            },
+            "16": {
+                "text": "16 - cncRdAxisData",
                 "params": [{"name": "class", 
                             "type": "number", 
                             "desc": "<br> 1 : Position value.<br>\
@@ -325,11 +371,10 @@
                             "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."},
                             {"name": "length", 
                             "type": "number", 
-                            "desc": "The number of axes to be read."}]
-                            
+                            "desc": "The number of axes to be read."}]          
             },
-            "5": {
-                "text": "5 - cncRdParam",
+            "18": {
+                "text": "18 - cncRdParam",
                 "params": [{"name": "param", 
                             "type": "number", 
                             "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
@@ -339,25 +384,10 @@
                                      0 : No axis.<br>\
                                      1,...,m : One axis (m = max. controlled axes).<br>\
                                      -1 : All axes."}]
-                            
             },
-            "6": {
-                "text": "6 - cncAbsolute",
-                "params": [{"name": "axis", 
-                            "type": "number", 
-                            "desc": "Axis number to be read.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
-                            
-            },
-            "7": {
-                "text": "7 - cncRelative",
-                "params": [{"name": "axis", 
-                            "type": "number", 
-                            "desc": "Axis number to be read.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
-                            
+            "20": {
+                "text": "20 - cncRdProgNum",
+                "params": []
             }
         };
 
