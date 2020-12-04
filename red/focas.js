@@ -69,7 +69,6 @@ module.exports = function (RED) {
     // <Begin> --- Config ---
     function FocasConfig(config) {
         RED.nodes.createNode(this, config);
-        let reconnect_timeout = 30000;
         let node = this;
 
         node.cncIP = config.cncIP;
@@ -95,12 +94,13 @@ module.exports = function (RED) {
                 return;
             }
 
-            node.focas = new Focas(node.libBuild, node.cncIP, node.cncPort, node.timeout, 'warn');
+            node.focas = new Focas(node.libBuild, node.cncIP, node.cncPort, node.timeout, node.logLevel);
             await node.focas.connect();
             
             node.focas.on("error", (err) => node.onError(err));
             node.focas.on("connected", () => node.onConnect);
             node.focas.on("disconnected", () => node.onDisconnect);
+            node.focas.on('exit', (code) => node.onExit(code));
         };
 
         node.connect();
@@ -115,31 +115,35 @@ module.exports = function (RED) {
         }
 
         node.onConnect = function onConnect() {
-            console.log("RED - Focas Config - onConnect");
             if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
             node.manageStatus('online');
         };
 
         node.onDisconnect = async function onDisconnect() {
-            console.log("RED - Focas Config - onDisconnect");
             node.manageStatus('offline');
 
             node.manageStatus('connecting');
         }
 
-        node.disconnect = async function disconnect() {
-            console.log("RED - Focas Config - disconnect");
+        node.onExit = async function onExit(code) {
+            console.log("child_process exit code:" + String(code));
+            if (!code) {
+                node.reconnect();
+            } else {
+                /* if the process exited by itself */
+                await node.disconnect();
+                node.reconnect();
+            }
+        }
 
-            node.focas.on('exit', (e) => {node.reconnect(e)});
+        node.disconnect = async function disconnect() {
             node.manageStatus('offline');
 
             await node.focas.destroy();
         };
 
-        node.reconnect = function reconnect(e) {
-            console.log("RED - Focas Config - reconnect");
-            console.log("child_process exit code: " + String (e))
+        node.reconnect = function reconnect() {
             node.disconnectCounter = 0;
 
             /* now that the child process is done we can remove all listeners */
@@ -152,8 +156,6 @@ module.exports = function (RED) {
         }
 
         node.onError = function onError(error) {
-            console.log("RED - Focas Config - onError", node.onClose);
-
             node.manageStatus('offline');
 
             node.error(errorMessage(error.code));
@@ -173,9 +175,6 @@ module.exports = function (RED) {
             node.emit("disconnect");
 
             node.removeListeners();
-
-            if(node.timerReconnect) clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
         };
 
         node.removeListeners = function removeListeners() {
@@ -205,10 +204,9 @@ module.exports = function (RED) {
     function FocasNode(config) {
 
         RED.nodes.createNode(this, config);
-
         let node = this;
         var statusVal;
-        node.endpoint = RED.nodes.getNode(config.endpoint);
+        node.endpoint = RED.nodes.getNode(config.config);
 
         node.onEndpointStatus = function onEndpointStatus(s) {
             node.generateStatus(node.endpoint.getStatus(s.status), statusVal);
