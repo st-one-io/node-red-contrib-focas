@@ -272,6 +272,11 @@ module.exports = function (RED) {
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
+                case '11': 
+                    node.endpoint.focas.cncAlarm2()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
                 case '16': 
                     node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
                     .catch((e) => node.error(e))
@@ -298,7 +303,6 @@ module.exports = function (RED) {
         });
 
         node.on("close", () => {
-
         });
 
     }

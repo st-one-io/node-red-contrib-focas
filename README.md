@@ -14,7 +14,7 @@
 | 8 - cncActs           |     yes     |
 | 9 - cncActs2          |     yes     |
 | 10 - cncActf          |     yes     |
-| 11 - cncAlarm2        |     no      |
+| 11 - cncAlarm2        |     yes     
 | 12 - cncRdAlmMsg      |     no      |
 | 13 - cncRdAlmInfo     |     no      |
 | 14 - cncRdAlmHisno    |     no      |
