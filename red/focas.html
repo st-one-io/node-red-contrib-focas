@@ -314,13 +314,31 @@
                 "text": "5 - cncRdParam",
                 "params": [{"name": "param", 
                             "type": "number", 
-                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information"},
+                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
                             {"name": "axis", 
                             "type": "number", 
                             "desc": "Specify the axis number.<br>\
                                      0 : No axis.<br>\
                                      1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes"}]
+                                     -1 : All axes."}]
+                            
+            },
+            "6": {
+                "text": "6 - cncAbsolute",
+                "params": [{"name": "axis", 
+                            "type": "number", 
+                            "desc": "Axis number to be read.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
+                            
+            },
+            "7": {
+                "text": "7 - cncRelative",
+                "params": [{"name": "axis", 
+                            "type": "number", 
+                            "desc": "Axis number to be read.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
                             
             }
         };

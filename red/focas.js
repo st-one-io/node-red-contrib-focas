@@ -249,6 +249,16 @@ module.exports = function (RED) {
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
+                case '6': 
+                    node.endpoint.focas.cncAbsolute(params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '7': 
+                    node.endpoint.focas.cncRelative(params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
                 default:
                     RED._("focas.function.unknown");
                     sendMsg(new Error(RED._("focas.function.unknown")), null, null);
