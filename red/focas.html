@@ -51,6 +51,20 @@
         </select>
     </div>
 
+    <div class="form-row">
+        <label for="node-config-input-logLevel">
+            <i class="fa fa-info-circle"></i>
+            <span data-i18n="focas.config.label.log"></span>
+        </label>
+        <select type="text" id="node-config-input-logLevel">
+            <option value="error">Error</option>
+            <option value="warn">Warn</option>
+            <option value="info">Info</option>
+            <option value="debug">Debug</option>
+            <option value="silly">Silly</option>
+        </select>
+    </div>
+
 </script>
 
 <script type="text/html" data-help-name="focas config">
@@ -137,6 +151,10 @@
             },
             cncModel: {
                 value: "0i-D",
+                required: true
+            },
+            logLevel: {
+                value: "error",
                 required: true
             }
         },

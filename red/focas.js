@@ -55,11 +55,9 @@ module.exports = function (RED) {
 
         node.cncIP = config.cncIP;
         node.cncPort = Number(config.cncPort);
-        //node.keepAlive = config.keepAlive;
         node.timeout = config.timeout;
         node.cncModel = config.cncModel;
-        //node.logLevel = config.logLevel;
-        node.logLevel = 'info'
+        node.logLevel = config.logLevel;
         node.libBuild = null;
         node.userDisconnect = false;
         node.onClose = false;

@@ -13,7 +13,8 @@
                 "port": "Port",
                 "timeout": "Timeout",
                 "retries": "Retries",
-                "models": "Model"
+                "models": "Model",
+                "log": "Log Level"
             }
         },
         "endpoint": {
