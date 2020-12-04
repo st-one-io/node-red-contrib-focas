@@ -10,11 +10,9 @@ module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
     function generateStatus(status, val) {
         var obj;
-
         if (typeof val != 'string' && typeof val != 'number' && typeof val != 'boolean') {
             val = RED._("focas.endpoint.status.online");
         }
-
         switch (status) {
             case 'online':
                 obj = {
@@ -80,7 +78,7 @@ module.exports = function (RED) {
         node.userDisconnect = false;
         node.onClose = false;
 
-        node.connectionStatus = 'offline';
+        node.connectionStatus = 'unknown';
         node.disconnectCounter = 0;
 
         switch (node.cncModel) {
@@ -184,16 +182,14 @@ module.exports = function (RED) {
             node.focas.removeListener("disconnected", (data) => node.onDisconnect(data));
         };
 
-        node.on("close", () => {
+        node.on("close", async() => {
             console.log("RED - Focas Config - 'close' event");
             node.onClose = true;
             if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
-            node.removeListeners();
-
             node.manageStatus('offline')
-            node.focas.destroy();
-
+            await node.focas.destroy();
+            node.removeListeners();
         });
     }
 
@@ -209,10 +205,10 @@ module.exports = function (RED) {
         node.endpoint = RED.nodes.getNode(config.config);
 
         node.onEndpointStatus = function onEndpointStatus(s) {
-            node.generateStatus(node.endpoint.getStatus(s.status), statusVal);
+            node.status(generateStatus(s.status, statusVal));
         }
 
-        node.status(generateStatus(), statusVal)
+        node.status(generateStatus(node.endpoint.getStatus(), statusVal));
         node.endpoint.on('__STATUS__', node.onEndpointStatus);
 
 
@@ -229,11 +225,11 @@ module.exports = function (RED) {
         }
 
         node.callFocas = function callFocas(msg) {
-            let fn = (config.fn) ? config.fn : msg.fn;
+            let fn = (config.function) ? config.function : msg.fn;
             let params = (msg.payload) ? msg.payload : null;
-
             switch(fn){
                 case '1': 
+                    console.log(node.endpoint.focas.cncStatInfo);
                     node.endpoint.focas.cncStatInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
