@@ -304,42 +304,22 @@
                 "params": []
             },
             "2": {
-                "text": "2 - cncSysInfo",
+                "text": "2 - cncStatInfo2",
                 "params": []
             },
             "3": {
-                "text": "3 - cncRdProgNum",
+                "text": "3 - cncSysInfo",
                 "params": []
             },
             "4": {
-                "text": "4 - cncRdAxisData",
-                "params": [{"name": "class", 
-                            "type": "number", 
-                            "desc": "<br> 1 : Position value.<br>\
-                                          2 : Servo.<br>\
-                                          3 : Spindle.<br>\
-                                          4 : Selected spindle.<br>\
-                                          5 : Speed."},
-                            {"name": "type", 
-                            "type": "array", 
-                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."},
-                            {"name": "length", 
-                            "type": "number", 
-                            "desc": "The number of axes to be read."}]
-                            
+                "text": "4 - cncSysInfoEx",
+                "params": []
             },
             "5": {
-                "text": "5 - cncRdParam",
-                "params": [{"name": "param", 
+                "text": "5 - cncSetTimeout",
+                "params": [{"name": "timeout", 
                             "type": "number", 
-                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
-                            {"name": "axis", 
-                            "type": "number", 
-                            "desc": "Specify the axis number.<br>\
-                                     0 : No axis.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
-                            
+                            "desc": "Seconds for timeout. If 0 is specified, timeout is ignored and functions wait infinity."}]
             },
             "6": {
                 "text": "6 - cncAbsolute",
@@ -358,6 +338,40 @@
                                      1,...,m : One axis (m = max. controlled axes).<br>\
                                      -1 : All axes."}]
                             
+            },
+            "16": {
+                "text": "16 - cncRdAxisData",
+                "params": [{"name": "class", 
+                            "type": "number", 
+                            "desc": "<br> 1 : Position value.<br>\
+                                          2 : Servo.<br>\
+                                          3 : Spindle.<br>\
+                                          4 : Selected spindle.<br>\
+                                          5 : Speed."},
+                            {"name": "type", 
+                            "type": "array", 
+                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."},
+                            {"name": "length", 
+                            "type": "number", 
+                            "desc": "The number of axes to be read."}]
+                            
+            },
+            "18": {
+                "text": "18 - cncRdParam",
+                "params": [{"name": "param", 
+                            "type": "number", 
+                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
+                            {"name": "axis", 
+                            "type": "number", 
+                            "desc": "Specify the axis number.<br>\
+                                     0 : No axis.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
+                            
+            },
+            "20": {
+                "text": "20 - cncRdProgNum",
+                "params": []
             }
         };
 
