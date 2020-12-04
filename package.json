@@ -2,7 +2,7 @@
   "name": "node-red-contrib-focas",
   "version": "1.0.0",
   "description": "Node-RED Node to communicate with CNCs using Fanuc FOCAS protocol",
-  "main": "index.js",
+  "main": "focas.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,5 +26,8 @@
     "nodes": {
         "focas": "red/focas.js"
     }
+  },
+  "dependencies": {
+    "focas-library": "file:../focas-bindings"
   }
 }
