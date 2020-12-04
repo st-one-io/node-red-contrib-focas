@@ -4,7 +4,7 @@
 -->
 
 <!-- --< Begin >--------- Focas Config (focas config) ---------------------- -->
-<script type="text/x-red" data-template-name="focas config">
+<script type="text/html" data-template-name="focas config">
 
     <div class="form-row">
         <label for="node-config-input-name">
@@ -30,7 +30,7 @@
             <i class="fa fa-clock-o"></i>
             <span data-i18n="focas.config.label.timeout"></span>
         </label>
-        <input type="text" id="node-config-input-timeout"> ms
+        <input type="text" id="node-config-input-timeout"> seconds
     </div>
 
     <div class="form-row">
@@ -41,21 +41,33 @@
         <input type="text" id="node-config-input-retries"> times
     </div>
 
-    <!-- <div class="form-row">
+    <div class="form-row">
         <label for="node-config-input-cncModel">
             <i class="fa fa-link"></i>
-            <span data-i18n="focas.config.label.force-link-layer"></span>
+            <span data-i18n="focas.config.label.models"></span>
         </label>
         <select type="text" id="node-config-input-cncModel">
-            <option value="auto" data-i18n="focas.config.label.options.auto"></option>
-            <option value="true" data-i18n="focas.config.label.options.true"></option>
-            <option value="false" data-i18n="focas.config.label.options.false"></option>
+            <option value="0i-D">0i-D</option>
         </select>
-    </div> -->
+    </div>
+
+    <div class="form-row">
+        <label for="node-config-input-logLevel">
+            <i class="fa fa-info-circle"></i>
+            <span data-i18n="focas.config.label.log.text"></span>
+        </label>
+        <select type="text" id="node-config-input-logLevel">
+            <option value="error" data-i18n="focas.config.label.log.error"></option>
+            <option value="warn" data-i18n="focas.config.label.log.warn"></option>
+            <option value="info" data-i18n="focas.config.label.log.info"></option>
+            <option value="debug" data-i18n="focas.config.label.log.debug"></option>
+            <option value="silly" data-i18n="focas.config.label.log.silly"></option>
+        </select>
+    </div>
 
 </script>
 
-<script type="text/x-red" data-help-name="focas config">
+<script type="text/html" data-help-name="focas config">
     <!-- <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
     
     <h3>Options</h3>
@@ -130,14 +142,21 @@
                 required: true
             },
             timeout: {
-                value: 3
+                value: 3,
+                required: true
             },
             retries: {
-                value: 3
+                value: 3,
+                required: true
             },
-            // cncModel: {
-            //     value: "default"
-            // }
+            cncModel: {
+                value: "0i-D",
+                required: true
+            },
+            logLevel: {
+                value: "error",
+                required: true
+            }
         },
         label: function () {
 
@@ -145,16 +164,16 @@
                 return this.name;
             }
 
-            let name = this.cncIP;
+            let name = this.cncModel + "@" + this.cncIP;
 
             return name;
         },
         oneditprepare: function () {
             $("#node-config-input-timeout").spinner({
-                min: 0
+                min: 3
             });
             $("#node-config-input-retries").spinner({
-                min: 0
+                min: 3
             });
         }
     });
@@ -164,7 +183,7 @@
 
 <!-- --< Begin >--------- Focas Node (focas node) ---------------------- -->
 
-<script type="text/x-red" data-template-name="focas node">
+<script type="text/html" data-template-name="focas node">
 
     <div class="form-row">
         <label for="node-input-config">
@@ -177,18 +196,10 @@
     <div class="form-row">
         <label for="node-input-function">
             <i class="fa fa-link"></i>
-            <span data-i18n="focas.node.label.mid"></span>
+            <span data-i18n="focas.node.label.fn"></span>
         </label>
         <select style="width:70%;" id="node-input-function"></select>
     </div>
-
-    <!-- <div class="form-row" id="div-forward-errors">
-        <label>&nbsp;</label>
-        <input type="checkbox" id="node-input-forwardErrors" style="display: inline-block; width: auto; vertical-align: top;">
-        <label for="node-input-forwardErrors" style="width:70%;">
-            <span data-i18n="focas.node.label.forward-errors"></span>
-        </label>
-    </div> -->
 
     <div class="form-row">
         <label for="node-input-name">
@@ -205,7 +216,7 @@
 
 </script>
 
-<script type="text/x-red" data-help-name="focas node">
+<script type="text/html" data-help-name="focas node">
     <!-- <p>Tool communication using OpenProtocol</p>
     <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
 
@@ -291,6 +302,62 @@
             "1": {
                 "text": "1 - cncStatInfo",
                 "params": []
+            },
+            "2": {
+                "text": "2 - cncSysInfo",
+                "params": []
+            },
+            "3": {
+                "text": "3 - cncRdProgNum",
+                "params": []
+            },
+            "4": {
+                "text": "4 - cncRdAxisData",
+                "params": [{"name": "class", 
+                            "type": "number", 
+                            "desc": "<br> 1 : Position value.<br>\
+                                          2 : Servo.<br>\
+                                          3 : Spindle.<br>\
+                                          4 : Selected spindle.<br>\
+                                          5 : Speed."},
+                            {"name": "type", 
+                            "type": "array", 
+                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."},
+                            {"name": "length", 
+                            "type": "number", 
+                            "desc": "The number of axes to be read."}]
+                            
+            },
+            "5": {
+                "text": "5 - cncRdParam",
+                "params": [{"name": "param", 
+                            "type": "number", 
+                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
+                            {"name": "axis", 
+                            "type": "number", 
+                            "desc": "Specify the axis number.<br>\
+                                     0 : No axis.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
+                            
+            },
+            "6": {
+                "text": "6 - cncAbsolute",
+                "params": [{"name": "axis", 
+                            "type": "number", 
+                            "desc": "Axis number to be read.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
+                            
+            },
+            "7": {
+                "text": "7 - cncRelative",
+                "params": [{"name": "axis", 
+                            "type": "number", 
+                            "desc": "Axis number to be read.<br>\
+                                     1,...,m : One axis (m = max. controlled axes).<br>\
+                                     -1 : All axes."}]
+                            
             }
         };
 
@@ -308,56 +375,25 @@
                 function: {
                     value: "",
                     required: true
-                },
-                // forwardErrors: {
-                //     value: false
-                // },
-                outputs: {
-                    value: 1
                 }
             },
             inputs: 1,
             outputs: 1,
             icon: "function.svg",
-            paletteLabel: "focas",
-            outputLabels: function (index) {
-
-                // TODO: Estudar melhores labels
-
-                // if (index === 0) {
-                //     return this._("focas.util.label.feedback");
-                // }
-
-                // if (index === 1) {
-                //     return this._("focas.util.label.data");
-                // }
-
-                // if (index === 2) {
-                //     return this._("focas.util.label.status-alarm");
-                // }
-
-                // if (index === 3) {
-                //     return this._("focas.util.label.ack-alarm");
-                // }
-
-            },
+            paletteLabel: "FOCAS",
             label: function () {
 
                 if (this.name) {
                     return this.name;
                 }
 
-                var name = "";
-
-                if (!this.function) {
+                if (this.function) {
+                    var wordsArr = base[this.function].text.split(" ");
+                    return wordsArr[wordsArr.length - 1];
+                } else {
                     return this._("focas.util.label.node");
                 }
-
-                if (name === "") {
-                    name = base[this.function];
-                }
-
-                return name;
+                
             },
             labelStyle: function () {
                 return this.name ? "node_label_italic" : "";
@@ -370,48 +406,21 @@
 
                 const select_function = $("#node-input-function");
 
-                atualizaFunction();
+                updateFunction();
 
                 // --- Changes
-                // select_function.change(() => {
-                //     controlaInterface();
-                //     atualizaOutputs();
-                // });
+                select_function.change(() => {
+                    updateInterface();
+                    updateTips()
+                });
 
                 // --- <Begin> -- Functions ---
 
-                function atualizaFunction() {
-
-                    // let subCategories = {
-                    //     "SUBSCRIBE": $('<optgroup>').prop('label', 'Subscriptions'),
-                    //     "REQUEST": $('<optgroup>').prop('label', 'Requests'),
-                    //     "COMMAND": $('<optgroup>').prop('label', 'Commands'),
-                    //     "CONTROL": $('<optgroup>').prop('label', 'Controls')
-                    // };
-
-                    // base_midGroup.forEach(item => {
-
-                    //     //issue #2 - Remove MidGroups 3 e 9999
-                    //     if (item === '3' || item === '9999') {
-                    //         return;
-                    //     }
-
-                    //     let option = $(`<option>`).val(item).text(base[item].text);
-                    //     subCategories[base[item].typeRequest].append(option);
-                    // });
-
-                    // subCategories["CONTROL"].append($(`<option>`).val("Connect").text("Connection"));
-                    // subCategories["CONTROL"].append($(`<option>`).val("Custom").text("Custom MID"));
+                function updateFunction() {
 
                     base_function.forEach(item => {
                         select_function.append($(`<option>`).val(item).text(base[item].text));
                     });
-                    
-                        
-                    // select_function.append(subCategories["SUBSCRIBE"]);
-                    // select_function.append(subCategories["REQUEST"]);
-                    // select_function.append(subCategories["COMMAND"]);
-                    // select_function.append(subCategories["CONTROL"]);
 
                     if (node.function) {
                         select_function.val(node.function);
@@ -422,169 +431,59 @@
                     }
                 }
 
-                function controlaInterface() {
+                function updateInterface() {
 
-                    // let localMidGroup = select_midGroup.val();
-                    // let localRevision = select_revision.val();
+                    let localFunction = select_function.val();
+                    
+                    const div_tips = $("#div-tips");
 
-                    // const div_customMid = $("#div-custom-mid");
-                    // const div_revision = $("#div-revision");
-                    // const div_customRevision = $("#div-custom-revision");
-                    // const div_autoSubscribe = $("#div-auto-subscribe");
-                    // const div_forwardErrors = $("#div-forward-errors");
-                    // const div_tips = $("#div-tips");
-
-                    // div_customMid.hide();
-                    // div_revision.hide();
-                    // div_customRevision.hide();
-                    // div_autoSubscribe.hide();
-                    // div_tips.hide();
-
-                    // if (!localMidGroup) {
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Connect") {
-                    //     div_tips.show();
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Custom") {
-                    //     div_tips.show();
-                    //     return;
-                    // }
-
-                    // if (localRevision === "Custom") {
-                    //     div_revision.show();
-                    //     div_customRevision.show();
-                    //     return;
-                    // }
-
-                    // let detalhes = base[localMidGroup];
-
-                    // if (detalhes.implemented && detalhes.typeRequest === "SUBSCRIBE" && detalhes.params
-                    //     .length === 0) {
-                    //     div_autoSubscribe.show();
-                    // }
-
-                    // div_revision.show();
-
-                    // if (localRevision) {
-                    //     div_tips.show();
-                    // }
+                    if (!localFunction) {
+                        return;
+                    } else {
+                        div_tips.show();
+                    }
                 }
 
-                function atualizaTips() {
+                function updateTips() {
 
-                    // let codeInfo = $("#code-info");
-                    // let localMidGroup = select_midGroup.val();
-                    // let localRevision = select_revision.val();
+                    let codeInfo = $("#code-info");
+                    let localFunction = select_function.val();
 
-                    // if (!localMidGroup) {
-                    //     return;
-                    // }
+                    if (!localFunction) {
+                        return;
+                    }
 
-                    // if (localMidGroup === "Connect") {
-                    //     let content = node._("focas.tips.connect");
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
+                    let details = base[localFunction];
 
-                    // if (localMidGroup === "Custom") {
-                    //     let content = node._("focas.tips.custom");
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
+                    let content = "";
 
-                    // let detalhes = base[localMidGroup];
+                    if (details.params.length === 0) {
+                        content = `<h4>${details.text}<\/h4>` + node._("focas.tips.not-params");
+                        codeInfo.html(content);
+                        return;
+                    } else {
+                        content = `<h4>${details.text}<\/h4>` +
+                            node._("focas.tips.params.header") +
+                            "<code>msg.payload = {}<\/code><br>";
 
-                    // let content = "";
+                        details.params.forEach((value) => {
+                            let param = node._("focas.tips.params.tags.param");
+                            let type = node._("focas.tips.params.tags.type");
+                            let desc = node._("focas.tips.params.tags.description");
 
-                    // if (!detalhes.implemented) {
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.not-implemented");
+                            let local = "<blockquote>" +
+                                `${param}: <code>msg.payload.${value.name}</code> <br>` +
+                                `${type}: <code>${value.type}</code> <br>` +
+                                `${desc}: ${value.desc}</blockquote>`;
 
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
+                            content = content.concat(local);
+                        });
 
-                    // if (detalhes.params.length === 0 && detalhes.typeRequest !== "SUBSCRIBE") {
+                        codeInfo.html(content);
+                        return;
+                    }
 
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.not-params");
-
-                    //     codeInfo.html(content);
-                    //     return;
-
-                    // }
-
-                    // if (detalhes.params.length === 0 && detalhes.typeRequest === "SUBSCRIBE") {
-
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.subscribe");
-
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
-
-                    // if (localRevision && localRevision !== "Auto" && localRevision !== "Custom") {
-
-                    //     content = `<h4>${detalhes.typeRequest} - ${detalhes.family}<\/h4>` +
-                    //         node._("focas.tips.params.header") +
-                    //         `<h6>Revision: ${localRevision} </h6>` +
-                    //         "<code>msg.payload = {}<\/code><br>";
-
-                    //     detalhes.params[localRevision].forEach((value) => {
-
-                    //         let param = node._("focas.tips.params.tags.param");
-                    //         let type = node._("focas.tips.params.tags.type");
-                    //         let desc = node._("focas.tips.params.tags.description");
-
-                    //         let local = "<blockquote>" +
-                    //             `${param}: <code>msg.payload.${value.name}</code> <br>` +
-                    //             `${type}: <code>${value.type}</code> <br>` +
-                    //             `${desc}: ${value.desc}</blockquote>`;
-
-                    //         content = content.concat(local);
-
-                    //     });
-
-                    //     codeInfo.html(content);
-                    //     return;
-                    // }
-                    // codeInfo.html("");
-                }
-
-                function atualizaOutputs() {
-
-                    // let localMidGroup = select_midGroup.val();
-
-                    // if (!localMidGroup) {
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Custom") {
-                    //     node.outputs = 1;
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "Connect") {
-                    //     node.outputs = 1;
-                    //     return;
-                    // }
-
-                    // if (localMidGroup === "71") {
-                    //     node.outputs = 4;
-                    //     return;
-                    // }
-
-                    // let typeRequest = base[localMidGroup].typeRequest;
-
-                    // if (typeRequest === "SUBSCRIBE") {
-                    //     node.outputs = 2;
-                    // } else {
-                    //     node.outputs = 1;
-                    // }
+                    codeInfo.html("");
                 }
 
                 // --- <End> -- Functions ---

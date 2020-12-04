@@ -1,0 +1,59 @@
+{
+    "focas":{
+        "node": {
+            "label": {
+                "config": "Config",
+                "fn": "Function",
+                "forward-errors": "Forward Errors"
+            }
+        },
+        "config": {
+            "label": {
+                "ip" : "IP Adress",
+                "port": "Port",
+                "timeout": "Timeout",
+                "retries": "Retries",
+                "models": "Model",
+                "log": {
+                    "text": "Log Level",
+                    "error": "Error",
+                    "warn": "Warn",
+                    "info": "Info",
+                    "debug": "Debug",
+                    "silly": "Silly"
+                } 
+            }
+        },
+        "endpoint": {
+            "status": {
+                "online": "online",
+                "offline":"offline",
+                "connecting": "connecting",
+                "unknown": "unknown"
+            },
+            "error": {
+                "default": "Error"
+            },
+            "functions": {
+                "unknown": "ERR_UN_FN - An unknown function was called"
+            }
+        },
+        "util": {
+            "label": {
+                "node": "FOCAS",
+                "name": "Name"
+            }
+        },
+        "tips": {
+            "not-params": "<p>This function does not require additional parameters.<\/p>",
+            "params": {
+                "header": "<p>This option does require additional parameters.<\/p> <h5>Parameters<\/h5>",
+                "tags": {
+                    "param": "Param",
+                    "type": "Type",
+                    "description": "Description"
+                }
+            }
+        }
+    }
+}

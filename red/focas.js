@@ -4,9 +4,7 @@
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
 
-const Focas = require('focas-library');
-const {EventEmitter} = require('events');
-
+const Focas = require('../../focas-bindings/focas-endpoint');
 
 module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
@@ -14,7 +12,7 @@ module.exports = function (RED) {
         var obj;
 
         if (typeof val != 'string' && typeof val != 'number' && typeof val != 'boolean') {
-            val = RED._("s7.endpoint.status.online");
+            val = RED._("focas.endpoint.status.online");
         }
 
         switch (status) {
@@ -25,78 +23,67 @@ module.exports = function (RED) {
                     text: val.toString()
                 };
                 break;
-            case 'badvalues':
-                obj = {
-                    fill: 'yellow',
-                    shape: 'dot',
-                    text: RED._("s7.endpoint.status.badvalues")
-                };
-                break;
             case 'offline':
                 obj = {
                     fill: 'red',
                     shape: 'dot',
-                    text: RED._("s7.endpoint.status.offline")
+                    text: RED._("focas.endpoint.status.offline")
                 };
                 break;
             case 'connecting':
                 obj = {
                     fill: 'yellow',
                     shape: 'dot',
-                    text: RED._("s7.endpoint.status.connecting")
+                    text: RED._("focas.endpoint.status.connecting")
                 };
                 break;
             default:
                 obj = {
                     fill: 'grey',
                     shape: 'dot',
-                    text: RED._("s7.endpoint.status.unknown")
+                    text: RED._("focas.endpoint.status.unknown")
                 };
         }
         return obj;
     }
 
     // <Begin> --- Config ---
-    function FocasConfig(values) {
-
-        EventEmitter.call(this);
-        RED.nodes.createNode(this, values);
-
+    function FocasConfig(config) {
+        RED.nodes.createNode(this, config);
+        let reconnect_timeout = 30000;
         let node = this;
 
-        node.machineIP = values.machineIP;
-        node.machinePort = Number(values.machinePort);
-        node.keepAlive = values.keepAlive;
-        node.timeout = values.timeout;
-        //node.machine = values.machine;
-        node.logLevel = values.logLevel;
+        node.cncIP = config.cncIP;
+        node.cncPort = Number(config.cncPort);
+        node.timeout = config.timeout;
+        node.cncModel = config.cncModel;
+        node.logLevel = config.logLevel;
         node.libBuild = null;
         node.userDisconnect = false;
         node.onClose = false;
 
         node.connectionStatus = 'offline';
+        node.timerReconnect = null;
 
-        switch (node.machine) {
-            case '0i':
+        switch (node.cncModel) {
+            case '0i-D':
             default:
                 node.libBuild = '_focas_fs0idd';
         }
 
         node.connect = async function connect() {
-
             if (node.connectionStatus == 'online') {
                 return;
             }
 
             clearTimeout(node.timerReconnect);
 
-            node.focas = new Focas(node.libBuild, node.machineIP, node.machinePort, node.timeout, node.logLevel);
+            node.focas = new Focas(node.libBuild, node.cncIP, node.cncPort, node.timeout, node.logLevel);
             await node.focas.connect();
             
             node.focas.on("error", (err) => node.onError(err));
             node.focas.on("connected", () => node.onConnect);
             node.focas.on("disconnected", () => node.onDisconnect);
-            
         };
 
         node.connect();
@@ -112,13 +99,15 @@ module.exports = function (RED) {
 
         node.onConnect = function onConnect() {
 
-            clearTimeout(node.timerReconnect);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
             node.manageStatus('online');
         };
 
         node.onDisconnect = function onDisconnect() {
+            node.manageStatus('offline');
 
+            node.manageStatus('connecting');
         }
 
         node.disconnect = function disconnect() {
@@ -135,9 +124,11 @@ module.exports = function (RED) {
 
         node.reconnect = function reconnect() {
 
-            clearTimeout(node.timerReconnect);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
-            if (node.onClose || node.userDisconnect || (node.connectionStatus == 'online')) {
+            node.disconnect();
+
+            if (node.onClose || (node.connectionStatus == 'online')) {
                 return;
             }
 
@@ -148,27 +139,21 @@ module.exports = function (RED) {
             return node.connectionStatus;
         }
 
-        // Begin::Event of Session Control Client - Open Protocol
         node.onError = function onError(error) {
-
             if (node.onClose) {
                 return;
             }
 
             node.manageStatus('offline');
 
-            node.emit("disconnect");
+            node.error(`${RED._("focas.endpoint.error")} ${error}`);
 
-            node.error(`${RED._("open-protocol.message.failed-connect")} ${error.address}:${error.port} ${error.code}`);
-
-            node.removeListeners();
-
-            clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), 5000);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
+            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
         };
 
         node.onClose = function onClose(error) {
-
+            node.error(error);
             if (node.onClose) {
                 return;
             }
@@ -178,12 +163,8 @@ module.exports = function (RED) {
 
             node.removeListeners();
 
-            clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), 5000);
-        };
-
-        node.onConnect = function onConnect(data) {
-            node.emit("connect", data);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
+            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
         };
 
         node.removeListeners = function removeListeners() {
@@ -191,23 +172,20 @@ module.exports = function (RED) {
             node.focas.removeListener("connected", (data) => node.onConnect(data));
             node.focas.removeListener("disconnected", (data) => node.onDisconnect(data));
         };
-        // End::Event of Session Control Client - Open Protocol
 
         node.on("close", () => {
-
             node.onClose = true;
-            clearTimeout(node.timerReconnect);
+            if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
             node.removeListeners();
 
             node.manageStatus('offline')
-            node.emit("disconnect");
             node.focas.destroy();
 
         });
     }
 
-    RED.nodes.registerType("op config", FocasConfig);
+    RED.nodes.registerType("focas config", FocasConfig);
     // <End> --- Config
 
     // <Begin> --- Node
@@ -241,14 +219,47 @@ module.exports = function (RED) {
 
         node.callFocas = function callFocas(msg) {
             let fn = (config.fn) ? config.fn : msg.fn;
-            let params = (msg.payload)? msg.payload : null;
+            let params = (msg.payload) ? msg.payload : null;
 
             switch(fn){
-                case 'cncStatInfo': 
+                case '1': 
                     node.endpoint.focas.cncStatInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
+                case '2': 
+                    node.endpoint.focas.cncSysInfo()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '3': 
+                    node.endpoint.focas.cncRdProgNum()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '4': 
+                    node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '5': 
+                    node.endpoint.focas.cncRdParam(params.param, params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '6': 
+                    node.endpoint.focas.cncAbsolute(params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '7': 
+                    node.endpoint.focas.cncRelative(params.axis)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                default:
+                    RED._("focas.function.unknown");
+                    sendMsg(new Error(RED._("focas.function.unknown")), null, null);
             }
         };
 
@@ -262,7 +273,7 @@ module.exports = function (RED) {
 
     }
 
-    RED.nodes.registerType("op node", FocasNode);
+    RED.nodes.registerType("focas node", FocasNode);
     // <End> --- Node
 
 };
