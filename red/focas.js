@@ -10,11 +10,9 @@ module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
     function generateStatus(status, val) {
         var obj;
-
         if (typeof val != 'string' && typeof val != 'number' && typeof val != 'boolean') {
             val = RED._("focas.endpoint.status.online");
         }
-
         switch (status) {
             case 'online':
                 obj = {
@@ -47,10 +45,28 @@ module.exports = function (RED) {
         return obj;
     }
 
+      /**
+     * @private
+     * @param {number} errorCode 
+     */
+    function errorMessage(errorCode) {
+        let msgText;
+        switch(errorCode){
+            case -16:
+                msgText = RED._('focas.endpoint.error.socket');
+                break;
+            case -8:
+                msgText = RED._('focas.endpoint.error.handle')
+                break;
+            default:
+                msgText = "Unknown error";
+        }
+        return errorCode + " - " + msgText;
+    }
+
     // <Begin> --- Config ---
     function FocasConfig(config) {
         RED.nodes.createNode(this, config);
-        let reconnect_timeout = 30000;
         let node = this;
 
         node.cncIP = config.cncIP;
@@ -62,8 +78,8 @@ module.exports = function (RED) {
         node.userDisconnect = false;
         node.onClose = false;
 
-        node.connectionStatus = 'offline';
-        node.timerReconnect = null;
+        node.connectionStatus = 'unknown';
+        node.disconnectCounter = 0;
 
         switch (node.cncModel) {
             case '0i-D':
@@ -76,14 +92,13 @@ module.exports = function (RED) {
                 return;
             }
 
-            clearTimeout(node.timerReconnect);
-
             node.focas = new Focas(node.libBuild, node.cncIP, node.cncPort, node.timeout, node.logLevel);
             await node.focas.connect();
             
             node.focas.on("error", (err) => node.onError(err));
             node.focas.on("connected", () => node.onConnect);
             node.focas.on("disconnected", () => node.onDisconnect);
+            node.focas.on('exit', (code) => node.onExit(code));
         };
 
         node.connect();
@@ -98,40 +113,39 @@ module.exports = function (RED) {
         }
 
         node.onConnect = function onConnect() {
-
             if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
             node.manageStatus('online');
         };
 
-        node.onDisconnect = function onDisconnect() {
+        node.onDisconnect = async function onDisconnect() {
             node.manageStatus('offline');
 
             node.manageStatus('connecting');
         }
 
-        node.disconnect = function disconnect() {
+        node.onExit = async function onExit(code) {
+            console.log("child_process exit code:" + String(code));
+            if (!code) {
+                node.reconnect();
+            } else {
+                /* if the process exited by itself */
+                await node.disconnect();
+                node.reconnect();
+            }
+        }
 
-            node.removeListener();
-
-            node.focas.destroy();
-
+        node.disconnect = async function disconnect() {
             node.manageStatus('offline');
-            node.emit("disconnect");
 
-            node.userDisconnect = true;
+            await node.focas.destroy();
         };
 
         node.reconnect = function reconnect() {
+            node.disconnectCounter = 0;
 
-            if(node.timerReconnect) clearTimeout(node.timerReconnect);
-
-            node.disconnect();
-
-            if (node.onClose || (node.connectionStatus == 'online')) {
-                return;
-            }
-
+            /* now that the child process is done we can remove all listeners */
+            node.removeListeners();
             node.connect();
         };
 
@@ -140,48 +154,42 @@ module.exports = function (RED) {
         }
 
         node.onError = function onError(error) {
-            if (node.onClose) {
-                return;
-            }
-
             node.manageStatus('offline');
 
-            node.error(`${RED._("focas.endpoint.error")} ${error}`);
+            node.error(errorMessage(error.code));
 
-            if(node.timerReconnect) clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
+            if (node.disconnectCounter >= 3)  return node.disconnect();
+            node.disconnectCounter++;
         };
 
         node.onClose = function onClose(error) {
-            node.error(error);
+            console.log("RED - Focas Config - onClose");
+            node.error(errorMessage(error.code));
             if (node.onClose) {
                 return;
             }
-
+            
             node.manageStatus('offline');
             node.emit("disconnect");
 
             node.removeListeners();
-
-            if(node.timerReconnect) clearTimeout(node.timerReconnect);
-            node.timerReconnect = setTimeout(() => node.reconnect(), reconnect_timeout);
         };
 
         node.removeListeners = function removeListeners() {
+            console.log("RED - Focas Config - removeListeners");
             node.focas.removeListener("error", (err) => node.onError(err));
             node.focas.removeListener("connected", (data) => node.onConnect(data));
             node.focas.removeListener("disconnected", (data) => node.onDisconnect(data));
         };
 
-        node.on("close", () => {
+        node.on("close", async() => {
+            console.log("RED - Focas Config - 'close' event");
             node.onClose = true;
             if(node.timerReconnect) clearTimeout(node.timerReconnect);
 
-            node.removeListeners();
-
             node.manageStatus('offline')
-            node.focas.destroy();
-
+            await node.focas.destroy();
+            node.removeListeners();
         });
     }
 
@@ -192,16 +200,15 @@ module.exports = function (RED) {
     function FocasNode(config) {
 
         RED.nodes.createNode(this, config);
-
         let node = this;
         var statusVal;
-        node.endpoint = RED.nodes.getNode(config.endpoint);
+        node.endpoint = RED.nodes.getNode(config.config);
 
         node.onEndpointStatus = function onEndpointStatus(s) {
-            node.generateStatus(node.endpoint.getStatus(s.status), statusVal);
+            node.status(generateStatus(s.status, statusVal));
         }
 
-        node.status(generateStatus(), statusVal)
+        node.status(generateStatus(node.endpoint.getStatus(), statusVal));
         node.endpoint.on('__STATUS__', node.onEndpointStatus);
 
 
@@ -218,11 +225,11 @@ module.exports = function (RED) {
         }
 
         node.callFocas = function callFocas(msg) {
-            let fn = (config.fn) ? config.fn : msg.fn;
+            let fn = (config.function) ? config.function : msg.fn;
             let params = (msg.payload) ? msg.payload : null;
-
             switch(fn){
                 case '1': 
+                    console.log(node.endpoint.focas.cncStatInfo);
                     node.endpoint.focas.cncStatInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))

@@ -32,7 +32,9 @@
                 "unknown": "unknown"
             },
             "error": {
-                "default": "Error"
+                "default": "Error",
+                "socket": "Socket Error. Check if machine is reachable",
+                "handle": "Session Expired"
             },
             "functions": {
                 "unknown": "ERR_UN_FN - An unknown function was called"
