@@ -257,6 +257,26 @@ module.exports = function (RED) {
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
+                case '8': 
+                    node.endpoint.focas.cncActs()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '9': 
+                    node.endpoint.focas.cncActs2(params.sp_no)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '10': 
+                    node.endpoint.focas.cncActf()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '11': 
+                    node.endpoint.focas.cncAlarm2()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
                 case '16': 
                     node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
                     .catch((e) => node.error(e))
@@ -283,7 +303,6 @@ module.exports = function (RED) {
         });
 
         node.on("close", () => {
-
         });
 
     }

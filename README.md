@@ -11,10 +11,10 @@
 | 5 - cncSetTimeout     |     yes     |
 | 6 - cncAbsolute       |     yes     |
 | 7 - cncRelative       |     yes     |
-| 8 - cncActs           |     no      |
-| 9 - cncActs2          |     no      |
-| 10 - cncActf          |     no      |
-| 11 - cncAlarm2        |     no      |
+| 8 - cncActs           |     yes     |
+| 9 - cncActs2          |     yes     |
+| 10 - cncActf          |     yes     |
+| 11 - cncAlarm2        |     yes     
 | 12 - cncRdAlmMsg      |     no      |
 | 13 - cncRdAlmInfo     |     no      |
 | 14 - cncRdAlmHisno    |     no      |
