@@ -1,1 +1,47 @@
 # node-red-contrib-focas
+
+## FOCAS Functions Implementation Progress
+
+| Function         | Implemented |
+| ---------------- | :---------: |
+| cncSysInfoEx     |     no      |
+| cncStatInfo      |     yes     |
+| cncRdAlmHistry   |     no      |
+| cncRdToolGrp     |     no      |
+| cncRdAlmInfo     |     no      |
+| cncRdPrgDirTime  |     no      |
+| cncSetTimeout    |     no      |
+| cncRdSpeed       |     no      |
+| cncSysInfo       |     yes     |
+| cncSysInfoEx     |     no      |
+| cncStatInfo2     |     no      |
+| cncActs          |     no      |
+| cncActs2         |     no      |
+| cncRdTimer       |     no      |
+| cncAlarm2        |     no      |
+| cncRdSpcss       |     no      |
+| cncRdDynamic2    |     no      |
+| cncRdAxisData    |     yes     |
+| cncRdSpMaxRpm    |     no      |
+| cncRdSpMeter     |     no      |
+| cncActf          |     no      |
+| cncAbsolute      |     yes     |
+| cncRelative      |     yes     |
+| cncRdPosition    |     no      |
+| cncRdSvMeter     |     no      |
+| cncRdProgInfo    |     no      |
+| cncRdProgNum     |     yes     |
+| cncExePrgName    |     no      |
+| cncRdPrgDirTime  |     no      |
+| cncRdProgDir2    |     no      |
+| cncRdProgDir3    |     no      |
+| cncRdProgDir4    |     no      |
+| cncRdLCmmt       |     no      |
+| cncRdAlmInfo     |     no      |
+| cncRdAlmMsg      |     no      |
+| cncRdAlmHisno    |     no      |
+| cncRdAlmHistry   |     no      |
+| cncRdNGrp        |     no      |
+| cncRdNTool       |     no      |
+| cncT1Info        |     no      |
+| cncRdParam       |     yes     |
