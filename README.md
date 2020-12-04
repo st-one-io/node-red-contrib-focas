@@ -2,6 +2,8 @@
 
 ## FOCAS Functions Implementation Progress
 
+
+
 | Function              | Implemented |
 | --------------------- | :---------: |
 | 1 - cncStatInfo       |     yes     |
@@ -14,7 +16,7 @@
 | 8 - cncActs           |     yes     |
 | 9 - cncActs2          |     yes     |
 | 10 - cncActf          |     yes     |
-| 11 - cncAlarm2        |     yes     
+| 11 - cncAlarm2        |     yes     |
 | 12 - cncRdAlmMsg      |     no      |
 | 13 - cncRdAlmInfo     |     no      |
 | 14 - cncRdAlmHisno    |     no      |
@@ -36,6 +38,11 @@
 | 30 - cncRdSpMaxRpm    |     no      |
 | 31 - cncRdTimer       |     no      |
 | 32 - cncRdToolGrp     |     no      |
+| 33 - cncRdLCmmt       |     no      |
+| 34 - cncRdNGrp        |     no      |
+| 35 - cncRdNTool       |     no      |
+| 36 - cncExePrgName    |     no      |
+| 37 - cncT1Info        |     no      |
 
 
 
@@ -60,11 +67,5 @@
 
 
 
-| cncExePrgName    |     no      |
-
-| cncRdLCmmt       |     no      |
 
 
-| cncRdNGrp        |     no      |
-| cncRdNTool       |     no      |
-| cncT1Info        |     no      |
