@@ -96,8 +96,8 @@ module.exports = function (RED) {
             await node.focas.connect();
             
             node.focas.on("error", (err) => node.onError(err));
-            node.focas.on("connected", () => node.onConnect);
-            node.focas.on("disconnected", () => node.onDisconnect);
+            node.focas.on("connected", () => node.onConnect());
+            node.focas.on("disconnected", () => node.onDisconnect());
             node.focas.on('exit', (code) => node.onExit(code));
         };
 
@@ -113,8 +113,6 @@ module.exports = function (RED) {
         }
 
         node.onConnect = function onConnect() {
-            if(node.timerReconnect) clearTimeout(node.timerReconnect);
-
             node.manageStatus('online');
         };
 
@@ -138,10 +136,12 @@ module.exports = function (RED) {
         node.disconnect = async function disconnect() {
             node.manageStatus('offline');
 
+            node.disconnectCounter = 0;
             await node.focas.destroy();
         };
 
         node.reconnect = function reconnect() {
+            if(node.onClose) return;
             node.disconnectCounter = 0;
 
             /* now that the child process is done we can remove all listeners */
@@ -177,9 +177,12 @@ module.exports = function (RED) {
 
         node.removeListeners = function removeListeners() {
             console.log("RED - Focas Config - removeListeners");
-            node.focas.removeListener("error", (err) => node.onError(err));
-            node.focas.removeListener("connected", (data) => node.onConnect(data));
-            node.focas.removeListener("disconnected", (data) => node.onDisconnect(data));
+            node.focas.removeListener("error", node.onError);
+            node.focas.removeListener("connected", node.onConnect);
+            node.focas.removeListener("disconnected", node.onDisconnect);
+            node.focas.removeListener('exit', node.onExit)
+
+            node.onClose = false;
         };
 
         node.on("close", async() => {
@@ -229,7 +232,6 @@ module.exports = function (RED) {
             let params = (msg.payload) ? msg.payload : null;
             switch(fn){
                 case '1': 
-                    console.log(node.endpoint.focas.cncStatInfo);
                     node.endpoint.focas.cncStatInfo()
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
