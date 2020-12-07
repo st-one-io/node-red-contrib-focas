@@ -162,30 +162,15 @@ module.exports = function (RED) {
             node.disconnectCounter++;
         };
 
-        node.onClose = function onClose(error) {
-            console.log("RED - Focas Config - onClose");
-            node.error(errorMessage(error.code));
-            if (node.onClose) {
-                return;
-            }
-            
-            node.manageStatus('offline');
-            node.emit("disconnect");
-
-            node.removeListeners();
-        };
-
         node.removeListeners = function removeListeners() {
             console.log("RED - Focas Config - removeListeners");
             node.focas.removeListener("error", node.onError);
             node.focas.removeListener("connected", node.onConnect);
             node.focas.removeListener("disconnected", node.onDisconnect);
             node.focas.removeListener('exit', node.onExit)
-
-            node.onClose = false;
         };
 
-        node.on("close", async() => {
+        node.on("close", async(done) => {
             console.log("RED - Focas Config - 'close' event");
             node.onClose = true;
             if(node.timerReconnect) clearTimeout(node.timerReconnect);
@@ -193,6 +178,7 @@ module.exports = function (RED) {
             node.manageStatus('offline')
             await node.focas.destroy();
             node.removeListeners();
+            done();
         });
     }
 
@@ -283,6 +269,16 @@ module.exports = function (RED) {
                     break;
                 case '11': 
                     node.endpoint.focas.cncAlarm2()
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '12':
+                    node.endpoint.focas.cncRdAlmMsg(params.type, params.num)
+                    .catch((e) => node.error(e))
+                    .then((data) => sendMsg(data, null, null))
+                    break;
+                case '13':
+                    node.endpoint.focas.cncRdTimer(params.type)
                     .catch((e) => node.error(e))
                     .then((data) => sendMsg(data, null, null))
                     break;
