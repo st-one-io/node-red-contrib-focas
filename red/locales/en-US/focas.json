@@ -1,5 +1,12 @@
 {
     "focas":{
+        "info": {
+            "connect": "Initiating connection to machine",
+            "disconnect": "Closing connection to machine",
+            "closed": "Connection closed",
+            "reconnect": "Trying to reconnect..."
+
+        },
         "node": {
             "label": {
                 "config": "Config",
@@ -34,7 +41,8 @@
             "error": {
                 "default": "Error",
                 "socket": "Socket Error. Check if machine is reachable",
-                "handle": "Session Expired"
+                "closed":"Connectin closed due to an unkown error",
+                "timeout": "Socket timeout. Check your connection connection"
             },
             "functions": {
                 "unknown": "ERR_UN_FN - An unknown function was called"
