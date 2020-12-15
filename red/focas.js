@@ -154,9 +154,13 @@ module.exports = function (RED) {
             if(node.retryTimeout) clearTimeout(node.retryTimeout);
 
             manageStatus('offline')
-            await node.focas.destroy().catch((e) => node.error(e));
-            node.removeListeners();
-            done();
+
+            if(node.focas) {
+                await node.focas.destroy();
+                node.removeListeners();
+                node.focas = null;
+                done();
+            }
         });
 
         node.connect().catch(node.onError);
