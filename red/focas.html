@@ -303,72 +303,72 @@
                 "text": "1 - cncStatInfo",
                 "params": []
             },
-            "2": {
-                "text": "2 - cncStatInfo2",
-                "params": []
-            },
+            // "2": {
+            //     "text": "2 - cncStatInfo2",
+            //     "params": []
+            // },
             "3": {
                 "text": "3 - cncSysInfo",
                 "params": []
             },
-            "4": {
-                "text": "4 - cncSysInfoEx",
-                "params": []
-            },
-            "5": {
-                "text": "5 - cncSetTimeout",
-                "params": [{"name": "timeout", 
-                            "type": "number", 
-                            "desc": "Seconds for timeout. If 0 is specified, timeout is ignored and functions wait infinity."}]
-            },
-            "6": {
-                "text": "6 - cncAbsolute",
-                "params": [{"name": "axis", 
-                            "type": "number", 
-                            "desc": "Axis number to be read.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]  
-            },
-            "7": {
-                "text": "7 - cncRelative",
-                "params": [{"name": "axis", 
-                            "type": "number", 
-                            "desc": "Axis number to be read.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
-            },
-            "8": {
-                "text": "8 - cncActs",
-                "params": []     
-            },
-            "9": {
-                "text": "9 - cncActs2",
-                "params": [{"name": "sp_no", 
-                            "type": "number", 
-                            "desc": "Spindle number to be read.<br>\
-                                     1,...,n : One spindle (n = max. number of spindle).<br>\
-                                     -1 : All spindles."}]        
-            },
-            "10": {
-                "text": "10 - cncActf",
-                "params": []
-            },
-            "11": {
-                "text": "11 - cncAlarm2",
-                "params": []
-            },
-            "12": {
-                "text": "12 - cncAlmMsg",
-                "params":  [{"name": "type",
-                            "type": "number",
-                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details"},
-                            {"name": "num",
-                             "type": "number",
-                             "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."
-                            }]
-            },
+            // "4": {
+            //     "text": "4 - cncSysInfoEx",
+            //     "params": []
+            // },
+            // "5": {
+            //     "text": "5 - cncSetTimeout",
+            //     "params": [{"name": "timeout", 
+            //                 "type": "number", 
+            //                 "desc": "Seconds for timeout. If 0 is specified, timeout is ignored and functions wait infinity."}]
+            // },
+            // "6": {
+            //     "text": "6 - cncAbsolute",
+            //     "params": [{"name": "axis", 
+            //                 "type": "number", 
+            //                 "desc": "Axis number to be read.<br>\
+            //                          1,...,m : One axis (m = max. controlled axes).<br>\
+            //                          -1 : All axes."}]  
+            // },
+            // "7": {
+            //     "text": "7 - cncRelative",
+            //     "params": [{"name": "axis", 
+            //                 "type": "number", 
+            //                 "desc": "Axis number to be read.<br>\
+            //                          1,...,m : One axis (m = max. controlled axes).<br>\
+            //                          -1 : All axes."}]
+            // },
+            // "8": {
+            //     "text": "8 - cncActs",
+            //     "params": []     
+            // },
+            // "9": {
+            //     "text": "9 - cncActs2",
+            //     "params": [{"name": "sp_no", 
+            //                 "type": "number", 
+            //                 "desc": "Spindle number to be read.<br>\
+            //                          1,...,n : One spindle (n = max. number of spindle).<br>\
+            //                          -1 : All spindles."}]        
+            // },
+            // "10": {
+            //     "text": "10 - cncActf",
+            //     "params": []
+            // },
+            // "11": {
+            //     "text": "11 - cncAlarm2",
+            //     "params": []
+            // },
+            // "12": {
+            //     "text": "12 - cncAlmMsg",
+            //     "params":  [{"name": "type",
+            //                 "type": "number",
+            //                 "desc": "Kind of data to be read. Refer to FOCAS documentation for more details"},
+            //                 {"name": "num",
+            //                  "type": "number",
+            //                  "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."
+            //                 }]
+            // },
             "13": {
-                "text": "13 - cncRdtimer",
+                "text": "13 - cncRdTimer",
                 "params":  [{"name": "type", 
                             "type": "number", 
                             "desc": "<br> 0 : Power on time.<br>\

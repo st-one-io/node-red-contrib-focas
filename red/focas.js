@@ -4,7 +4,7 @@
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
 
-const FocasEndpoint = require('node-focas');
+const FocasEndpoint = require('../../node-focas');
 
 module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
@@ -74,18 +74,11 @@ module.exports = function (RED) {
         node.timeout = config.timeout * 1000;
         node.cncModel = config.cncModel;
         node.logLevel = config.logLevel;
-        node.libBuild = null;
         node.userDisconnect = false;
         node.onClose = false;
 
         node.connectionStatus = 'unknown';
         node.retryTimeout = 0;
-
-        switch (node.cncModel) {
-            case '0i-D':
-            default:
-                node.libBuild = '_focas_fs0idd';
-        }
 
         function manageStatus(newStatus) {
             if (node.connectionStatus == newStatus) return;
@@ -106,7 +99,7 @@ module.exports = function (RED) {
             node.focas.on('error', (err) => node.onError(err));
             node.focas.on('connected', () => node.onConnect());
             node.focas.on('disconnected', () => node.onDisconnect());
-            node.focas.on('closed', (err) => node.onError(err));
+            node.focas.on('closed', (err) => node.onClose(err));
             node.focas.on('timeout', () => node.onTimeout());
         };
 
@@ -187,111 +180,106 @@ module.exports = function (RED) {
         node.status(generateStatus(node.endpoint.getStatus(), statusVal));
         node.endpoint.on('__STATUS__', node.onEndpointStatus);
 
-
-        function sendMsg(data, key, status) {
-            if(key === undefined ) key = '';
-
-            let msg = {
-                payload: data,
-                topic:key
-            }
-
-            statusVal = status !== undefined ? status: data;
-            node.send(msg);
+        function sendMsg(msg, send, done, data) {
+            
+            /* TODO: handle errors received by FOCAS functions with done()
+            instead of just passing in 'msg' object */
+            
+            msg.payload = data;
+            send(msg);
+            done();
         }
 
-        node.callFocas = function callFocas(msg) {
+
+        node.on('input', (msg, send, done) => {
+            
             let fn = (config.function) ? config.function : msg.fn;
             let params = (msg.payload) ? msg.payload : null;
-            switch(fn){
+            switch(fn) {
                 case '1': 
                     node.endpoint.focas.cncStatInfo()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
-                case '2': 
-                    node.endpoint.focas.cncStatInfo2()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
+                // case '2': 
+                //     node.endpoint.focas.cncStatInfo2()
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
                 case '3': 
                     node.endpoint.focas.cncSysInfo()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
-                case '4': 
-                    node.endpoint.focas.cncSysInfoEx()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '5': 
-                    node.endpoint.focas.cncSetTimeout(params.timeout)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '6': 
-                    node.endpoint.focas.cncAbsolute(params.axis)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '7': 
-                    node.endpoint.focas.cncRelative(params.axis)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '8': 
-                    node.endpoint.focas.cncActs()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '9': 
-                    node.endpoint.focas.cncActs2(params.sp_no)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '10': 
-                    node.endpoint.focas.cncActf()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '11': 
-                    node.endpoint.focas.cncAlarm2()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
-                case '12':
-                    node.endpoint.focas.cncRdAlmMsg(params.type, params.num)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
-                    break;
+                // case '4': 
+                //     node.endpoint.focas.cncSysInfoEx()
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '5': 
+                //     node.endpoint.focas.cncSetTimeout(params.timeout)
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '6': 
+                //     node.endpoint.focas.cncAbsolute(params.axis)
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '7': 
+                //     node.endpoint.focas.cncRelative(params.axis)
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '8': 
+                //     node.endpoint.focas.cncActs()
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '9': 
+                //     node.endpoint.focas.cncActs2(params.sp_no)
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '10': 
+                //     node.endpoint.focas.cncActf()
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '11': 
+                //     node.endpoint.focas.cncAlarm2()
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
+                // case '12':
+                //     node.endpoint.focas.cncRdAlmMsg(params.type, params.num)
+                //     .catch((e) => node.error(e))
+                //     .then((data) => sendMsg(data, null, null))
+                //     break;
                 case '13':
                     node.endpoint.focas.cncRdTimer(params.type)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
                 case '16': 
                     node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
                 case '18': 
                     node.endpoint.focas.cncRdParam(params.param, params.axis)
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
                 case '20': 
                     node.endpoint.focas.cncRdProgNum()
-                    .catch((e) => node.error(e))
-                    .then((data) => sendMsg(data, null, null))
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
                 default:
                     RED._('focas.function.unknown');
-                    sendMsg(new Error(RED._('focas.function.unknown')), null, null);
+                    done(new Error(RED._('focas.function.unknown')));
             }
-        };
-
-        node.on('input', (msg) => {
-            node.callFocas(msg);
         });
 
         node.on('close', () => {
