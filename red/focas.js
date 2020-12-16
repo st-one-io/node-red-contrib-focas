@@ -94,13 +94,14 @@ module.exports = function (RED) {
 
             manageStatus('connecting');
             node.focas = new FocasEndpoint({address: node.cncIP, port: node.cncPort, timeout: node.timeout, log: node.logLevel});
-            await node.focas.connect();    
-            
-            node.focas.on('error', (err) => node.onError(err));
+                
+            node.focas.on('err', (err) => {node.onError(err)});
             node.focas.on('connected', () => node.onConnect());
             node.focas.on('disconnected', () => node.onDisconnect());
             node.focas.on('closed', (err) => node.onClose(err));
             node.focas.on('timeout', () => node.onTimeout());
+
+            await node.focas.connect();
         };
 
         node.onConnect = function onConnect() {
@@ -128,9 +129,11 @@ module.exports = function (RED) {
         }
 
         node.onError = async function onError(e) {
+            
             if(node.focas) {
                 await node.focas.destroy();
             }
+
             node.focas = null;
             node.error(e);
 
@@ -143,24 +146,26 @@ module.exports = function (RED) {
         };
 
         node.removeListeners = function removeListeners() {
-            node.focas.removeListener('error', node.onError);
+            node.focas.removeListener('err', node.onError);
             node.focas.removeListener('connected', node.onConnect);
             node.focas.removeListener('disconnected', node.onDisconnect);
             node.focas.removeListener('closed', node.onClose);
             node.focas.removeListener('timeout', node.onTimeout);
         };
 
-        node.on('close', async(done) => {
+        node.on('close', async (done) => {
+            
             if(node.retryTimeout) clearTimeout(node.retryTimeout);
 
             manageStatus('offline')
 
-            if(node.focas) {
-                await node.focas.destroy();
+            if(node.focas != null) {
                 node.removeListeners();
+                await node.focas.destroy();
                 node.focas = null;
-                done();
             }
+
+            done();
         });
 
         node.connect().catch(node.onError);
