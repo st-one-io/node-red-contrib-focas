@@ -79,6 +79,7 @@ module.exports = function (RED) {
 
         node.connectionStatus = 'unknown';
         node.retryTimeout = 0;
+        node.onDestroy = false;
 
         function manageStatus(newStatus) {
             if (node.connectionStatus == newStatus) return;
@@ -93,9 +94,9 @@ module.exports = function (RED) {
             clearTimeout(node.retryTimeout);
 
             manageStatus('connecting');
-            node.focas = new FocasEndpoint({address: node.cncIP, port: node.cncPort, timeout: node.timeout, log: node.logLevel});
-                
-            node.focas.on('err', (err) => {node.onError(err)});
+            node.focas = new FocasEndpoint({address: node.cncIP, port: node.cncPort, timeout: node.timeout, log: node.logLevel});  
+            
+            node.focas.on('error', (err) => node.onError(err));
             node.focas.on('connected', () => node.onConnect());
             node.focas.on('disconnected', () => node.onDisconnect());
             node.focas.on('closed', (err) => node.onClose(err));
@@ -129,21 +130,29 @@ module.exports = function (RED) {
         }
 
         node.onError = async function onError(e) {
-            
-            if(node.focas) {
-                await node.focas.destroy();
-            }
-
-            node.focas = null;
             node.error(e);
 
+            if (node.onDestroy) {
+                node.onDestroy = true;
+                
+                await node.focas.destroy();
+                node.removeListeners();
+                node.focas = null; 
+
+                node.onDestroy = false;
+            }
+            
             manageStatus('offline');
+            node.reconnect();
+            return;
+        };
+
+        node.reconnect = function reconnect() {
             node.warn(RED._('focas.info.reconnect'));
 
             if (node.retryTimeout != null) clearTimeout(node.retryTimeout);
-            node.retryTimeout = setTimeout(node.connect, 8000);   
-            return;
-        };
+            node.retryTimeout = setTimeout(node.connect, 10000); 
+        }
 
         node.removeListeners = function removeListeners() {
             node.focas.removeListener('err', node.onError);
@@ -158,9 +167,7 @@ module.exports = function (RED) {
             if(node.retryTimeout) clearTimeout(node.retryTimeout);
 
             manageStatus('offline')
-
-            if(node.focas != null) {
-                node.removeListeners();
+            if(node.focas) {
                 await node.focas.destroy();
                 node.focas = null;
             }
