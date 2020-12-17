@@ -26,8 +26,5 @@
     "nodes": {
         "focas": "red/focas.js"
     }
-  },
-  "dependencies": {
-    "focas-library": "file:../focas-bindings"
   }
 }
