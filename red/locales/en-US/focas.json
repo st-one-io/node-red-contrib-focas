@@ -9,7 +9,7 @@
         },
         "node": {
             "label": {
-                "config": "Config",
+                "config": "Endpoint",
                 "fn": "Function",
                 "forward-errors": "Forward Errors"
             }

@@ -22,9 +22,9 @@
     "url": "https://github.com/st-one-io/node-red-contrib-focas/issues"
   },
   "homepage": "https://github.com/st-one-io/node-red-contrib-focas#readme",
-  "node-red" : {
+  "node-red": {
     "nodes": {
-        "focas": "red/focas.js"
+      "focas": "red/focas.js"
     }
   }
 }

@@ -4,7 +4,7 @@
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
 
-const FocasEndpoint = require('../../node-focas');
+const FocasEndpoint = require('node-focas');
 
 module.exports = function (RED) {
     // ----------- Focas Endpoint -----------
@@ -219,78 +219,38 @@ module.exports = function (RED) {
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                // case '2': 
-                //     node.endpoint.focas.cncStatInfo2()
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                case '3': 
+                case '2': 
                     node.endpoint.focas.cncSysInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                // case '4': 
-                //     node.endpoint.focas.cncSysInfoEx()
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '5': 
-                //     node.endpoint.focas.cncSetTimeout(params.timeout)
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '6': 
-                //     node.endpoint.focas.cncAbsolute(params.axis)
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '7': 
-                //     node.endpoint.focas.cncRelative(params.axis)
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '8': 
-                //     node.endpoint.focas.cncActs()
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '9': 
-                //     node.endpoint.focas.cncActs2(params.sp_no)
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '10': 
-                //     node.endpoint.focas.cncActf()
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '11': 
-                //     node.endpoint.focas.cncAlarm2()
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                // case '12':
-                //     node.endpoint.focas.cncRdAlmMsg(params.type, params.num)
-                //     .catch((e) => node.error(e))
-                //     .then((data) => sendMsg(data, null, null))
-                //     break;
-                case '13':
+                case '3':
                     node.endpoint.focas.cncRdTimer(params.type)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '16': 
+                case '4': 
                     node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '18': 
+                case '5': 
                     node.endpoint.focas.cncRdParam(params.param, params.axis)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '20': 
+                case '6': 
                     node.endpoint.focas.cncRdProgNum()
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
+                    break;
+                case '7': 
+                    node.endpoint.focas.sampleData(params.datanum, params.channels)
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
+                    break;
+                case '8': 
+                    node.endpoint.focas.cncRdAlmMsg2(params.type, params.num)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;

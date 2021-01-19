@@ -34,14 +34,6 @@
     </div>
 
     <div class="form-row">
-        <label for="node-config-input-retries">
-            <i class="fa fa-repeat"></i>
-            <span data-i18n="focas.config.label.retries"></span>
-        </label>
-        <input type="text" style="width: 100%;" id="node-config-input-retries"> times
-    </div>
-
-    <div class="form-row">
         <label for="node-config-input-cncModel">
             <i class="fa fa-link"></i>
             <span data-i18n="focas.config.label.models"></span>
@@ -138,14 +130,10 @@
                 required: true
             },
             cncPort: {
-                value: 4545,
+                value: 8193,
                 required: true
             },
             timeout: {
-                value: 3,
-                required: true
-            },
-            retries: {
                 value: 3,
                 required: true
             },
@@ -170,9 +158,6 @@
         },
         oneditprepare: function () {
             $("#node-config-input-timeout").spinner({
-                min: 3
-            });
-            $("#node-config-input-retries").spinner({
                 min: 3
             });
         }
@@ -303,72 +288,12 @@
                 "text": "1 - cncStatInfo",
                 "params": []
             },
-            // "2": {
-            //     "text": "2 - cncStatInfo2",
-            //     "params": []
-            // },
-            "3": {
-                "text": "3 - cncSysInfo",
+            "2": {
+                "text": "2 - cncSysInfo",
                 "params": []
             },
-            // "4": {
-            //     "text": "4 - cncSysInfoEx",
-            //     "params": []
-            // },
-            // "5": {
-            //     "text": "5 - cncSetTimeout",
-            //     "params": [{"name": "timeout", 
-            //                 "type": "number", 
-            //                 "desc": "Seconds for timeout. If 0 is specified, timeout is ignored and functions wait infinity."}]
-            // },
-            // "6": {
-            //     "text": "6 - cncAbsolute",
-            //     "params": [{"name": "axis", 
-            //                 "type": "number", 
-            //                 "desc": "Axis number to be read.<br>\
-            //                          1,...,m : One axis (m = max. controlled axes).<br>\
-            //                          -1 : All axes."}]  
-            // },
-            // "7": {
-            //     "text": "7 - cncRelative",
-            //     "params": [{"name": "axis", 
-            //                 "type": "number", 
-            //                 "desc": "Axis number to be read.<br>\
-            //                          1,...,m : One axis (m = max. controlled axes).<br>\
-            //                          -1 : All axes."}]
-            // },
-            // "8": {
-            //     "text": "8 - cncActs",
-            //     "params": []     
-            // },
-            // "9": {
-            //     "text": "9 - cncActs2",
-            //     "params": [{"name": "sp_no", 
-            //                 "type": "number", 
-            //                 "desc": "Spindle number to be read.<br>\
-            //                          1,...,n : One spindle (n = max. number of spindle).<br>\
-            //                          -1 : All spindles."}]        
-            // },
-            // "10": {
-            //     "text": "10 - cncActf",
-            //     "params": []
-            // },
-            // "11": {
-            //     "text": "11 - cncAlarm2",
-            //     "params": []
-            // },
-            // "12": {
-            //     "text": "12 - cncAlmMsg",
-            //     "params":  [{"name": "type",
-            //                 "type": "number",
-            //                 "desc": "Kind of data to be read. Refer to FOCAS documentation for more details"},
-            //                 {"name": "num",
-            //                  "type": "number",
-            //                  "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."
-            //                 }]
-            // },
-            "13": {
-                "text": "13 - cncRdTimer",
+            "3": {
+                "text": "3 - cncRdTimer",
                 "params":  [{"name": "type", 
                             "type": "number", 
                             "desc": "<br> 0 : Power on time.<br>\
@@ -378,8 +303,8 @@
                                           4 : Free purpose."
                             }]
             },
-            "16": {
-                "text": "16 - cncRdAxisData",
+            "4": {
+                "text": "4 - cncRdAxisData",
                 "params": [{"name": "class", 
                             "type": "number", 
                             "desc": "<br> 1 : Position value.<br>\
@@ -394,26 +319,47 @@
                             "type": "number", 
                             "desc": "The number of axes to be read."}]          
             },
-            "18": {
-                "text": "18 - cncRdParam",
+            "5": {
+                "text": "5 - cncRdParam",
                 "params": [{"name": "param", 
                             "type": "number", 
                             "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
                             {"name": "axis", 
                             "type": "number", 
                             "desc": "Specify the axis number.<br>\
-                                     0 : No axis.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
+                                    <ul><li>0 : No axis.</li>\
+                                        <li>1,...,m : One axis (m = max. controlled axes).</li>\
+                                        <li>-1 : All axes.</li></ul>"}]
             },
-            "20": {
-                "text": "20 - cncRdProgNum",
+            "6": {
+                "text": "6 - cncRdProgNum",
                 "params": []
+            },
+            "7": {
+                "text": "7 - sampleData",
+                "params": [{"name": "datanum", 
+                            "type": "number", 
+                            "desc": "Number of total points to be sampled (must be multiple of 8)."},
+                            {"name": "channels", 
+                            "type": "Array of objects", 
+                            "desc": "Each position (channel) of the array should have the following two parameters.<br>\
+                                     <ul><li> axis: Servo axis number : 1 to 32 - Spindle axis number: -1 to -8</li>\
+                                     <li>type: Sampling data type</li></ul>"}]
+                                   
+            },
+            "8": {
+                "text": "8 - cncRdAlmMsg2",
+                "params": [{"name": "type", 
+                            "type": "number", 
+                            "desc": "Type of the alarm (-1 for all types)."},
+                            {"name": "num", 
+                            "type": "number", 
+                            "desc": "Number of alarm messages to be read."}]
             }
         };
 
         RED.nodes.registerType('focas node', {
-            category: 'advanced',
+            category: 'CNC',
             color: '#ffdd00',
             defaults: {
                 name: {
