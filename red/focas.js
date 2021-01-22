@@ -45,25 +45,6 @@ module.exports = function (RED) {
         return obj;
     }
 
-      /**
-     * @private
-     * @param {number} errorCode 
-     */
-    function errorMessage(errorCode) {
-        let msgText;
-        switch(errorCode){
-            case -16:
-                msgText = RED._('focas.endpoint.error.socket');
-                break;
-            case -8:
-                msgText = RED._('focas.endpoint.error.handle')
-                break;
-            default:
-                msgText = 'Unknown error';
-        }
-        return errorCode + ' - ' + msgText;
-    }
-
     // <Begin> --- Config ---
     function FocasConfig(config) {
         RED.nodes.createNode(this, config);
@@ -212,45 +193,45 @@ module.exports = function (RED) {
         node.on('input', (msg, send, done) => {
             
             let fn = (config.function) ? config.function : msg.fn;
-            let params = (msg.payload) ? msg.payload : null;
+            //let params = (msg.payload) ? msg.payload : null;
             switch(fn) {
-                case '1': 
+                case 0: 
                     node.endpoint.focas.cncStatInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '2': 
+                case 1: 
                     node.endpoint.focas.cncSysInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '3':
-                    node.endpoint.focas.cncRdTimer(params.type)
+                case 2:
+                    node.endpoint.focas.cncRdTimer(config.timerType)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '4': 
-                    node.endpoint.focas.cncRdAxisData(params.class, params.type, params.length)
+                case 3: 
+                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, config.axesDataType, 10)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '5': 
-                    node.endpoint.focas.cncRdParam(params.param, params.axis)
+                case 4: 
+                    node.endpoint.focas.cncRdParam(config.paramNumber, config.paramAxis)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '6': 
+                case 5: 
                     node.endpoint.focas.cncRdProgNum()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '7': 
-                    node.endpoint.focas.sampleData(params.datanum, params.channels)
+                case 6: 
+                    node.endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case '8': 
-                    node.endpoint.focas.cncRdAlmMsg2(params.type, params.num)
+                case 7: 
+                    node.endpoint.focas.cncRdAlmMsg2(config.almType - 1 , config.almCount)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;

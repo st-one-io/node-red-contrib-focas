@@ -19,10 +19,13 @@
             <i class="fa fa-home"></i>
             <span data-i18n="focas.config.label.ip"></span>
         </label>
-        <input type="text" style="width: 30%" id="node-config-input-cncIP" data-i18n="[placeholder]focas.config.label.ip">
+        <input type="text" id="node-config-input-cncIP" style="width: 140px;" data-i18n="[placeholder]focas.config.label.ip">
 
-        <span style="margin-left:10px" data-i18n="focas.config.label.port"></span>
-        <input type="text" id="node-config-input-cncPort" style="width: 60px;" data-i18n="[placeholder]focas.config.label.port">
+        <label for="node-config-input-cncPort" style="margin-left:10px; width: 60px">
+            <i class="fa fa-door-closed"></i>
+            <span data-i18n="focas.config.label.port"></span>
+        </label>
+        <input type="text" id="node-config-input-cncPort" style="width: 100px;" data-i18n="[placeholder]focas.config.label.port">
     </div>
 
     <div class="form-row">
@@ -170,14 +173,14 @@
 
 <script type="text/html" data-template-name="focas node">
 
-    <div class="form-row">
+    <div class="form-row" style="min-width: 550px">
         <label for="node-input-config">
             <i class="fa fa-cog"></i>
             <span data-i18n="focas.node.label.config"></span>
         </label>
         <input type="text" id="node-input-config" data-i18n="[placeholder]focas.node.label.config">
     </div>
-
+    
     <div class="form-row">
         <label for="node-input-function">
             <i class="fa fa-link"></i>
@@ -186,6 +189,79 @@
         <select style="width:70%;" id="node-input-function"></select>
     </div>
 
+    <!-- Timers -->
+    <div id="timers">
+        <div class="form-row">
+            <label for="node-input-timerType">
+                <i class="fa fa-clock-o"></i>
+                <span data-i18n="focas.node.label.timeType"></span>
+            </label>
+            <select style="width:70%;" id="node-input-timerType"></select>
+        </div>
+    </div>
+
+    <!-- Axes Data -->
+    <div id="axesData">
+        <div class="form-row">
+            <label for="node-input-axesDataType">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.axesDataType"></span>
+            </label>
+            <select style="width:70%;" id="node-input-axesDataType"></select>
+        </div>
+    </div>
+
+    <!-- Parameters -->
+    <div id="parameters">
+        <div class="form-row">
+            <label for="node-input-paramNumber">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.paramNumber"></span>
+            </label>
+            <input type="text" id="node-input-paramNumber" style="width: 140px" data-i18n="[placeholder]focas.node.label.paramNumber">
+    
+            <label for="node-input-paramAxis" style="margin-left:10px; width: 60px">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.paramAxis"></span>
+            </label>
+            <input type="text" id="node-input-paramAxis" style="width: 100px" data-i18n="[placeholder]focas.node.label.paramAxis">
+        </div>
+    </div>  
+
+    <!-- Sample Data -->
+    <div id="sampleData">
+        <div class="form-row">
+            <label for="node-input-sampleDataNo">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.sampleDataNo"></span>
+            </label>
+            <input type="text" id="node-input-sampleDataNo" data-i18n="[placeholder]focas.node.label.sampleDataNo">
+        </div> 
+        <div class="form-row node-input-rule-container-row">
+            <ol id="node-input-rule-container"></ol>
+        </div>
+    </div> 
+
+    <!-- Alarms -->
+    <div id="alarms">
+        <div class="form-row">
+            <label for="node-input-almType">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.almType"></span>
+            </label>
+            <select style="width:70%" id="node-input-almType"></select>
+        </div>
+        <div class="form-row">
+            <label for="node-input-almCount">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.almCount"></span>
+            </label>
+            <input type="text" id="node-input-almCount" data-i18n="[placeholder]focas.node.label.almCount">
+        </div>
+    </div>
+
+    <br>
+
     <div class="form-row">
         <label for="node-input-name">
             <i class="fa fa-tag"></i>
@@ -193,11 +269,6 @@
         </label>
         <input type="text" id="node-input-name" data-i18n="[placeholder]focas.util.label.name">
     </div>
-
-    <div class="form-tips" id="div-tips">
-        <div id="code-info" style="height:auto; width:90%; font-family: monospace"></div>
-    </div>
-
 
 </script>
 
@@ -283,80 +354,58 @@
 <script type="text/javascript">
     (function () {
 
-        let base = {
-            "1": {
-                "text": "1 - cncStatInfo",
-                "params": []
+        let functions = [
+            {
+                "text": "Status Info"
             },
-            "2": {
-                "text": "2 - cncSysInfo",
-                "params": []
+            {
+                "text": "System Info"
             },
-            "3": {
-                "text": "3 - cncRdTimer",
-                "params":  [{"name": "type", 
-                            "type": "number", 
-                            "desc": "<br> 0 : Power on time.<br>\
-                                          1 : Operating time.<br>\
-                                          2 : Cutting time.<br>\
-                                          3 : Cycle time.<br>\
-                                          4 : Free purpose."
-                            }]
+            {
+                "text": "Timers",
+                "types": ["Power time","Operating time","Cutting time","Cycle time","Free purpose"]
             },
-            "4": {
-                "text": "4 - cncRdAxisData",
-                "params": [{"name": "class", 
-                            "type": "number", 
-                            "desc": "<br> 1 : Position value.<br>\
-                                          2 : Servo.<br>\
-                                          3 : Spindle.<br>\
-                                          4 : Selected spindle.<br>\
-                                          5 : Speed."},
-                            {"name": "type", 
-                            "type": "array", 
-                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."},
-                            {"name": "length", 
-                            "type": "number", 
-                            "desc": "The number of axes to be read."}]          
+            {
+                "text": "Axes Data",
+                "classes": ["Position","Servo","Spindle","Selected Spindle","Speed"],
+                "1": ["Absolute position", "Machine position", "Relative position", "Distance to go", "Handle interruption(Input unit)", "Handle interruption(Output unit)", "Start point of program restart", "Distance to go of program restart", "Start point of block restart", "Distance to go of block restart"], 
+                "2": ["Servo load meter", "Load current (% unit)", "Load current (Ampere unit)"], 
+                "3": ["Spindle load meter", "Spindle motor speed", "Spindle speed (parameter 3799#2)", "Spindle speed (motor speed)", "Spindle load meter (average of each 250ms)"], 
+                "4": ["Spindle load meter", "Spindle motor speed", "Spindle speed (parameter 3799#2)", "Spindle speed (motor speed)", "Spindle load meter (average of each 250ms)"], 
+                "5": ["Feed rate (F) (Feed per minute)", "Spindle speed", "Jog speed/Dry run speed", "Tool tip speed", "Rotation speed of servo motor", "Feed rate (F/S) Note"]
             },
-            "5": {
-                "text": "5 - cncRdParam",
-                "params": [{"name": "param", 
-                            "type": "number", 
-                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
-                            {"name": "axis", 
-                            "type": "number", 
-                            "desc": "Specify the axis number.<br>\
-                                    <ul><li>0 : No axis.</li>\
-                                        <li>1,...,m : One axis (m = max. controlled axes).</li>\
-                                        <li>-1 : All axes.</li></ul>"}]
+            {
+                "text": "Parameters"
             },
-            "6": {
-                "text": "6 - cncRdProgNum",
-                "params": []
+            {
+                "text": "Program Number"
             },
-            "7": {
-                "text": "7 - sampleData",
-                "params": [{"name": "datanum", 
-                            "type": "number", 
-                            "desc": "Number of total points to be sampled (must be multiple of 8)."},
-                            {"name": "channels", 
-                            "type": "Array of objects", 
-                            "desc": "Each position (channel) of the array should have the following two parameters.<br>\
-                                     <ul><li> axis: Servo axis number : 1 to 32 - Spindle axis number: -1 to -8</li>\
-                                     <li>type: Sampling data type</li></ul>"}]
-                                   
+            {
+                "text": "Sample Data",
+                "Servo": ["","","","","","","","","","","","","","","","","","","","","","","","","","Motor winding temperature", "Pulsecoder temperature"],
+                "Spindle": ["","","","","","","","","Motor winding temperature"]
             },
-            "8": {
-                "text": "8 - cncRdAlmMsg2",
-                "params": [{"name": "type", 
-                            "type": "number", 
-                            "desc": "Type of the alarm (-1 for all types)."},
-                            {"name": "num", 
-                            "type": "number", 
-                            "desc": "Number of alarm messages to be read."}]
-            }
-        };
+            {
+                "text": "Alarm Messages",
+                "types": ["All types",
+                          "Parameter switch on (SW)",
+                          "Power off parameter set (PW)",
+                          "I/O error (IO)",
+                          "Foreground P/S (PS)",
+                          "Overtravel,External data (OT)",
+                          "Overheat alarm (OH)",
+                          "Servo alarm (SV)",
+                          "Data I/O error (SR)",
+                          "Macro alarm (MC)",
+                          "Spindle alarm (SP)",
+                          "Other alarm (DS)",
+                          "Malfunction prevent functions (IE)",
+                          "Background P/S (BG)",
+                          "Syncronized error (SN)", "", // reserved
+                          "External alarm message (EX)","","","", // reserved
+                          "PMC error (PC)"]
+            },
+        ]
 
         RED.nodes.registerType('focas node', {
             category: 'CNC',
@@ -372,7 +421,34 @@
                 function: {
                     value: "",
                     required: true
-                }
+                },
+                timerType: {
+                    value: ""
+                },
+                axesDataClass: {
+                    value: ""
+                },
+                axesDataType: {
+                    value: ""
+                },
+                paramNumber: {
+                    value: ""
+                },
+                paramAxis: {
+                    value: ""
+                },
+                sampleDataNo: {
+                    value: ""
+                },
+                sampleDataChannels: {
+                    value: []
+                },
+                almType: {
+                    value: ""
+                },
+                almCount: {
+                    value: ""
+                },
             },
             inputs: 1,
             outputs: 1,
@@ -385,8 +461,7 @@
                 }
 
                 if (this.function) {
-                    var wordsArr = base[this.function].text.split(" ");
-                    return wordsArr[wordsArr.length - 1];
+                    return functions[this.function].text;
                 } else {
                     return this._("focas.util.label.node");
                 }
@@ -397,93 +472,201 @@
             },
             oneditprepare: function () {
 
-                let base_function = Object.keys(base);
-
                 let node = this;
 
                 const select_function = $("#node-input-function");
 
-                updateFunction();
+                const timers = $("#timers");
+                const axes_data = $("#axesData");
+                const sample_data = $("#sampleData");
+                const parameters = $("#parameters");
+                const alarms = $("#alarms");
+
+                const input_axes_data_type = $("#node-input-axesDataType");
+
+                setupInterface();
 
                 // --- Changes
-                select_function.change(() => {
-                    updateInterface();
-                    updateTips()
+                select_function.change(updateFnFields);
+                input_axes_data_type.change(function() {
+                    let selected = $(this).find(':selected');
+                    let cls = selected.closest('optgroup').attr('label');
+                    node.axesDataClass = functions[3].classes.indexOf(cls) + 1;
+                });
+
+                $("#node-input-rule-container").css('min-height','250px').editableList({
+                    addItem: _addItem,
+                    removeItem: _updateIndex,
+                    sortItems: _updateIndex,
+                    sortable: true,
+                    removable: true
+                });
+                
+                node.sampleDataChannels.forEach((item) => {
+                    $("#node-input-rule-container").editableList('addItem',item);
                 });
 
                 // --- <Begin> -- Functions ---
 
-                function updateFunction() {
-
-                    base_function.forEach(item => {
-                        select_function.append($(`<option>`).val(item).text(base[item].text));
+                function setupInterface() {
+                    
+                    functions.forEach((item, index) => {
+                        select_function.append($(`<option>`).val(index).text(item.text));
                     });
 
-                    if (node.function) {
-                        select_function.val(node.function);
-                    }
+                    if (node.function !== "") select_function.val(node.function);
+                    else select_function.val(0);
 
-                    if (select_function.val() === "") {
-                        select_function.val("1");
-                    }
-                }
-
-                function updateInterface() {
-
-                    let localFunction = select_function.val();
+                    /* ------------------- */
                     
-                    const div_tips = $("#div-tips");
+                    // Timers
+                    const input_timer_type = $("#node-input-timerType");
+                    functions[2].types.forEach((item, index) => {
+                        input_timer_type.append($(`<option>`).val(index).text(item));
+                    });
 
-                    if (!localFunction) {
-                        return;
-                    } else {
-                        div_tips.show();
+                    if (node.timerType !== "") input_timer_type.val(node.timerType);
+                    else input_timer_type.val(0);
+
+                    /* ------------------- */
+                    
+                    functions[3].classes.forEach((item,index) => {
+                        let cls = $('<optgroup/>', { label: item }).appendTo(input_axes_data_type);
+                        functions[3][index+1].forEach((it,i) => {
+                            cls.append($(`<option>`).attr("id","axesCls"+index+"Type"+i).val(i).text(it));
+                        })
+                    });
+
+                    if (node.axesDataClass !== "") {                         
+                        $("#axesCls"+(node.axesDataClass-1)+"Type"+node.axesDataType).prop('selected',true);
+                    }
+
+                    /* ------------------- */
+
+                    // Alarms
+                    const input_alarm_type = $("#node-input-almType");
+                    functions[7].types.forEach((item, index) => {
+                        if (index === 15 || (index >= 17 && index <= 19)) return; // skips reserved positions
+                        input_alarm_type.append($(`<option>`).val(index).text(item))
+                    });
+                    
+                    if (node.almType !== "") input_alarm_type.val(node.almType); 
+                    else input_alarm_type.val(0); // All types
+
+                    // /* ------------------- */
+
+                }
+
+                function updateFnFields() {
+                    const currentFn = select_function.val();
+
+                    timers.hide();
+                    axes_data.hide();
+                    sample_data.hide();
+                    parameters.hide();
+                    alarms.hide();
+
+                    switch(currentFn) {
+                    case "2":    
+                        timers.show();
+                        break;
+                    case "3":    
+                        axes_data.show();
+                        break;
+                    case "4":    
+                        parameters.show();
+                        break;
+                    case "6":    
+                        sample_data.show();
+                        break;
+                    case "7":    
+                        alarms.show();
+                        break;
                     }
                 }
 
-                function updateTips() {
+                function _addItem(container, index, data) {
 
-                    let codeInfo = $("#code-info");
-                    let localFunction = select_function.val();
-
-                    if (!localFunction) {
-                        return;
+                    if (jQuery.isEmptyObject(data)) {
+                        data.axis = 1;
+                        data.type = 25;
                     }
+                    
+                    let id = Math.floor((0x99999-0x10000)*Math.random()).toString();
+                    let servoStr = "Servo";
+                    let spindleStr = "Spindle";
+                    
+                    let toggleBtns = $("<span>").addClass("button-group").appendTo(container);
 
-                    let details = base[localFunction];
+                    toggleBtns.append($("<button>").attr("type","button").addClass("red-ui-button toggle btn-servo btn-group"+id).addClass(data.axis > 0 ? "selected": "").text(servoStr));
+                    toggleBtns.append($("<button>").attr("type","button").addClass("red-ui-button toggle btn-spindle btn-group"+id).addClass(data.axis < 0 ? "selected": "").text(spindleStr));
 
-                    let content = "";
+                    $(".btn-group"+id).on("click", function() {
+                        $(".btn-group"+id).removeClass("selected");
+                        $(this).addClass("selected");
+                        
+                        let selectField = $(".sampleDataType"+id);
+                        
+                        if ($(this).hasClass("btn-servo")) {
+                            updateTypeField(selectField,servoStr);
+                        } else if ($(this).hasClass("btn-spindle")) {
+                            updateTypeField(selectField,spindleStr);
+                        }
+                    })
 
-                    if (details.params.length === 0) {
-                        content = `<h4>${details.text}<\/h4>` + node._("focas.tips.not-params");
-                        codeInfo.html(content);
-                        return;
-                    } else {
-                        content = `<h4>${details.text}<\/h4>` +
-                            node._("focas.tips.params.header") +
-                            "<code>msg.payload = {}<\/code><br>";
+                    /* ---------------------------- */
 
-                        details.params.forEach((value) => {
-                            let param = node._("focas.tips.params.tags.param");
-                            let type = node._("focas.tips.params.tags.type");
-                            let desc = node._("focas.tips.params.tags.description");
+                    let axisLbl = $("<label>").attr("for","node-input-sampleDataAxis"+id).width(35).text("Axis").appendTo(container);
+                    let axisField = $("<input>").attr("type","text").attr("id","node-input-sampleDataAxis"+id).addClass("sampleDataAxis").width(30).appendTo(container);
+                    axisField.val(data.axis < 0 ? -data.axis : data.axis);
 
-                            let local = "<blockquote>" +
-                                `${param}: <code>msg.payload.${value.name}</code> <br>` +
-                                `${type}: <code>${value.type}</code> <br>` +
-                                `${desc}: ${value.desc}</blockquote>`;
+                    /* ---------------------------- */
 
-                            content = content.concat(local);
-                        });
-
-                        codeInfo.html(content);
-                        return;
+                    let updateTypeField = function(field,typeGroup) {
+                        field.empty();
+                        functions[6][typeGroup].forEach((item, i) => {
+                            if (item === "") return;
+                            field.append($("<option>").val(i).text(item));
+                        })
                     }
+                    
+                    let selectField = $("<select>").css("width","180px").css("margin-left","15px").addClass("sampleDataType"+id).appendTo(container);
+                    updateTypeField(selectField, data.axis > 0 ? servoStr : spindleStr);
+                    selectField.val(data.type);
 
-                    codeInfo.html("");
+                    /* ---------------------------- */
+
+                    let channelLbl = $("<span>").css("float","right").css("margin-top","10px").css("width","64px").appendTo(container);
+                    channelLbl.append(' Channel <span class="node-input-rule-index">'+(index+1)+'</span> ');
+
                 }
-
+                
+                function _updateIndex(data) {
+                    var channels = $("#node-input-rule-container").editableList('items');
+                    channels.each(function(i) {
+                        $(this).find(".node-input-rule-index").html(i+1);
+                    });
+                }
+                
                 // --- <End> -- Functions ---
+                
+            },
+            oneditsave: function() {
+                var channels = $("#node-input-rule-container").editableList('items');
+                let node = this;
+                node.sampleDataChannels = [];
+                channels.each(function(i) {
+                    let channel = {};
+                    channel.axis = $(this).find(".sampleDataAxis").val();
+                    channel.type = $(this).find("select").val();
+                    
+                    if ($(this).find(".btn-spindle").hasClass("selected")) {
+                        channel.axis = -channel.axis; // Spindle axis numbers are negative (according to FOCAS)
+                    }
+                    
+                    node.sampleDataChannels.push(channel);
+                });
+
             }
         });
 

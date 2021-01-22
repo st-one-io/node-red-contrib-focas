@@ -11,7 +11,13 @@
             "label": {
                 "config": "Endpoint",
                 "fn": "Function",
-                "forward-errors": "Forward Errors"
+                "timeType": "Type",
+                "axesDataType": "Type",
+                "paramNumber": "Number",
+                "paramAxis": "Axis",
+                "sampleDataNo": "No. of samples",
+                "almType": "Type",
+                "almCount": "Count"
             }
         },
         "config": {
