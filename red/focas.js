@@ -75,7 +75,7 @@ module.exports = function (RED) {
             clearTimeout(node.retryTimeout);
 
             manageStatus('connecting');
-            node.focas = new FocasEndpoint({address: node.cncIP, port: node.cncPort, timeout: node.timeout, log: node.logLevel});  
+            node.focas = new FocasEndpoint({address: node.cncIP, port: node.cncPort, timeout: node.timeout, log: true, logLevel: node.logLevel});  
             
             node.focas.on('error', node.onError);
             node.focas.on('connected', node.onConnect);
@@ -195,42 +195,42 @@ module.exports = function (RED) {
             let fn = (config.function) ? config.function : msg.fn;
             //let params = (msg.payload) ? msg.payload : null;
             switch(fn) {
-                case 0: 
+                case "0": 
                     node.endpoint.focas.cncStatInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case 1: 
+                case "1":     
                     node.endpoint.focas.cncSysInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case 2:
+                case "2":     
                     node.endpoint.focas.cncRdTimer(config.timerType)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case 3: 
-                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, config.axesDataType, 10)
+                case "3": 
+                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, config.axesDataType, 5)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case 4: 
+                case "4": 
                     node.endpoint.focas.cncRdParam(config.paramNumber, config.paramAxis)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case 5: 
+                case "5": 
                     node.endpoint.focas.cncRdProgNum()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
-                case 6: 
-                    node.endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                case "6": 
+                    // node.endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
+                    // .then((data) => sendMsg(msg, send, done, data))
+                    // .catch((error) => done(error))
                     break;
-                case 7: 
+                case "7": 
                     node.endpoint.focas.cncRdAlmMsg2(config.almType - 1 , config.almCount)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
