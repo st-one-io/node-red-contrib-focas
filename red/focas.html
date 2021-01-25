@@ -22,7 +22,6 @@
         <input type="text" id="node-config-input-cncIP" style="width: 140px;" data-i18n="[placeholder]focas.config.label.ip">
 
         <label for="node-config-input-cncPort" style="margin-left:10px; width: 60px">
-            <i class="fa fa-door-closed"></i>
             <span data-i18n="focas.config.label.port"></span>
         </label>
         <input type="text" id="node-config-input-cncPort" style="width: 100px;" data-i18n="[placeholder]focas.config.label.port">
@@ -63,60 +62,21 @@
 </script>
 
 <script type="text/html" data-help-name="focas config">
-    <!-- <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
+    <p>This node was created by <a href="https://st-one.io" target="_blank">ST-One</a></p>
     
-    <h3>Options</h3>
-    <dl class="message-properties">
-        <dt>Controller
-            <span class="property-type">IP Address</span>
-        </dt>
-        <dd> ip address of controller. </dd>
-    
-        <dt>Port
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> port of controller. </dd>
-    
-        <dt>KeepAlive
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> max time without communication. </dd>
-    
-        <dt>Timeout
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> max time without connection. </dd>
-    
-        <dt>Retries
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> retries of connection. </dd>
-    
-        <dt>Link Layer
-            <span class="property-type">Link Layer</span>
-        </dt>
-        <dd> Link Layer mode, 
-            <code>Auto</code>: auto negotiation,
-            <code>True</code>: force link layer,
-            <code>False</code>: disable link layer
-        </dd>
-    
-        <dt>Disable MID parsing
-            <span class="property-type">String</span>
-        </dt>
-        <dd> receiver MIDs with body not parsing. </dd>
-    
-        <dt>Raw Data
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> adds the parameter <code>_raw</code> in all messages, containing the message buffer. </dd>
-    
-        <dt>Generic Mode
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> the nodes use calls generics. </dd>
-    
-    </dl> -->
+    <h3>Details</h3>
+
+    <p>
+        The <b>Timeout</b> configuration sets the maximum amount of time that the CNC
+		may take to answer our requests.
+	</p>
+    <p>
+        Depending on the <b>Model</b> specified some functions may not be available due to the lack of support from the CNC.
+    </p>
+    <p>
+		It's possible to change the log level of the FOCAS communication protocol by setting the <b>Log Level</b> option
+		from "Error" to "Silly". Those logs are printed to the Node-RED console.
+	</p>
 
 </script>
 
@@ -274,81 +234,8 @@
 </script>
 
 <script type="text/html" data-help-name="focas node">
-    <!-- <p>Tool communication using OpenProtocol</p>
-    <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
-
-    <h3>Inputs</h3>
-    <dl class="message-properties">
-        <p> Use the parameters according to tips in node. </p>
-        <dt>
-            payload
-            <span class="property-type"> string | buffer | object </span>
-        </dt>
-        <dt>
-            subscribe
-            <span class="property-type"> boolean </span>
-        </dt>
-    </dl>
-    
-    <h3>Outputs</h3>
-    <ol class="node-ports">
-        <li>Feedback
-            <dl class="message-properties">
-                <dt> msg <span class="property-type"> object </object></span> </dt>
-                <dd> header of MID. </dd>
-    
-                <dt> msg.payload <span class="property-type"> object | string </object></span> </dt>
-                <dd> body of MID. </dd>
-            </dl>
-        </li>
-    
-        <li>Data
-            <p> Available in <code>subscribe</code> and <code>custom</code> options. </p>
-            <dl class="message-properties">
-                <dt> msg <span class="property-type"> object </object></span> </dt>
-                <dd> header of MID. </dd>
-    
-                <dt> msg.payload <span class="property-type"> object | string </object></span> </dt>
-                <dd> body of MID. </dd>
-            </dl>
-        </li>
-    </ol>
-    
-    <h3>Options</h3>
-    <dl class="message-properties">
-        <dt>Config
-            <span class="property-type">OP Controller</span>
-        </dt>
-        <dd> select controller. </dd>
-    
-        <dt>Mid Group
-            <span class="property-type">MID Group</span>
-        </dt>
-        <dd> select function this node. </dd>
-    
-        <dt>Revision
-            <span class="property-type">Revision</span>
-        </dt>
-        <dd> select revision for MID Group, 
-            <code>Auto</code>: auto negotiation,
-            <code>Custom</code>: add revision not listed
-        </dd>
-    
-        <dt>Custom revision
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> add number of custom revision. </dd>
-    
-        <dt>Auto Subscribe
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> active auto subscribe on start. </dd>
-    
-        <dt>Forward Errors
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> this option adds parameter <code>msg.error</code> in error cases. </dd>
-    </dl> -->
+    <p>Reads data from a Fanuc CNC</p>
+    <p>This node was created by <a href="https://st-one.io" target="_blank">ST-One</a></p>
 
 </script>
 
