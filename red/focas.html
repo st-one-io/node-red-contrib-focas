@@ -237,6 +237,48 @@
     <p>Reads data from a Fanuc CNC</p>
     <p>This node was created by <a href="https://st-one.io" target="_blank">ST-One</a></p>
 
+    <h3>Details</h3>
+
+    <h4><i>Parameters</i></h4>
+    <ul>
+        <li>
+            <b>Number:</b> tells which parameter to read from the CNC. The full 
+            list of parameters can be found on the CNC's Parameter Manual.
+        </li>
+        <li>
+            <b>Axis:</b> must be set to <code>0</code> when there`s no axis to be specified
+        </li>
+    </ul>
+    
+    <h4><i>Program Number</i></h4>
+    <p>
+        Reads the number of the current selected program on the CNC.
+    </p>
+    
+    <h4><i>Sample Data</i></h4>
+    <p>
+        This function samples data related to Servo and/or Spindle. The maximum number 
+        of channels for data sampling is 8. Each channel sets a different kind
+        of data to be sampled all at once. The sampling period is 1 millisecond.
+    </p>
+    <ul>
+        <li>
+            <b>No. of samples:</b> sets how many sample points are going to be read. 
+            It must be a <i>multiple of 8</i>, otherwise it will throw an error.
+        </li>
+    </ul>
+    
+    <h4><i>Alarm Messages</i></h4>
+    <p>
+        Reads currently active CNC alarm messages. 
+    </p>
+    <ul>
+        <li>
+            <b>Count:</b> the amount of alarm messages to read at once. When the value set is greater than
+            the actual number of active alarms the function will end up returning all current alarm messages.
+        </li>
+    </ul>
+
 </script>
 
 <script type="text/javascript">
@@ -251,7 +293,7 @@
             },
             {
                 "text": "Timers",
-                "types": ["Power time","Operating time","Cutting time","Cycle time","Free purpose"]
+                "types": ["Power on time","Operating time","Cutting time","Cycle time","Free purpose"]
             },
             {
                 "text": "Axes Data",
@@ -491,6 +533,11 @@
 
                 function _addItem(container, index, data) {
 
+                    if (index >= 8) { // Maximum of 8 channels
+                        $("#node-input-rule-container").editableList('removeItem',data);
+                        return;
+                    }
+                    
                     if (jQuery.isEmptyObject(data)) {
                         data.axis = 1;
                         data.type = 25;
