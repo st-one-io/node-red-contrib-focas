@@ -134,7 +134,8 @@
             },
             cncPort: {
                 value: 8193,
-                required: true
+                required: true,
+                validate: RED.validators.number()
             },
             timeout: {
                 value: 3,
@@ -432,13 +433,25 @@
                     value: ""
                 },
                 paramNumber: {
-                    value: ""
+                    value: 6712,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "4") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
                 },
                 paramAxis: {
-                    value: ""
+                    value: 0,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "4") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
                 },
                 sampleDataNo: {
-                    value: ""
+                    value: 8,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "6") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
                 },
                 sampleDataChannels: {
                     value: []
@@ -447,7 +460,11 @@
                     value: ""
                 },
                 almCount: {
-                    value: ""
+                    value: 1,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "7") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
                 },
             },
             inputs: 1,
@@ -657,8 +674,8 @@
                 node.sampleDataChannels = [];
                 channels.each(function(i) {
                     let channel = {};
-                    channel.axis = $(this).find(".sampleDataAxis").val();
-                    channel.type = $(this).find("select").val();
+                    channel.axis = Number($(this).find(".sampleDataAxis").val());
+                    channel.type = Number($(this).find("select").val());
                     
                     if ($(this).find(".btn-spindle").hasClass("selected")) {
                         channel.axis = -channel.axis; // Spindle axis numbers are negative (according to FOCAS)
@@ -666,7 +683,6 @@
                     
                     node.sampleDataChannels.push(channel);
                 });
-
             }
         });
 
