@@ -298,10 +298,10 @@
             {
                 "text": "Axes Data",
                 "classes": ["Position","Servo","Spindle","Selected Spindle","Speed"],
-                // "1": ["Absolute position", "Machine position", "Relative position", "Distance to go", "Handle interruption(Input unit)", "Handle interruption(Output unit)", "Start point of program restart", "Distance to go of program restart", "Start point of block restart", "Distance to go of block restart"], 
-                "2": ["Servo load meter", "Load current (% unit)", "Load current (Ampere unit)"], 
-                "3": ["Spindle load meter", "Spindle motor speed", "Spindle speed (parameter 3799#2)", "Spindle speed (motor speed)", "Spindle load meter (average of each 250ms)"], 
-                "4": ["Spindle load meter", "Spindle motor speed", "Spindle speed (parameter 3799#2)", "Spindle speed (motor speed)", "Spindle load meter (average of each 250ms)"], 
+                "1": ["Absolute position", "Machine position", "Relative position", "Distance to go", "Handle interruption(Input unit)", "Handle interruption(Output unit)", "Start point of program restart", "Distance to go of program restart"], 
+                "2": ["Servo load meter (Ampere unit)", "Load current (% unit)", "Load current (Ampere unit)"], 
+                "3": ["Spindle load meter (% unit)", "Spindle motor speed (rpm unit)", "Spindle speed (param. 3799#2) (rpm unit)", "Spindle speed (motor speed) (rpm unit)", "Spindle load meter (avg. of each 250ms) (% unit)"], 
+                "4": ["Spindle load meter (% unit)", "Spindle motor speed (rpm unit)", "Spindle speed (param. 3799#2) (rpm unit)", "Spindle speed (motor speed) (rpm unit)", "Spindle load meter (avg. of each 250ms) (% unit)"], 
                 // "5": ["Feed rate (F) (Feed per minute)", "Spindle speed", "Jog speed/Dry run speed", "Tool tip speed", "Rotation speed of servo motor", "Feed rate (F/S) Note"]
             },
             {
@@ -477,7 +477,7 @@
                     /* ------------------- */
                     
                     functions[3].classes.forEach((item,index) => {
-                        if (index === 0 || index === 4) return;
+                        if (index === 4) return;
                         let cls = $('<optgroup/>', { label: item }).appendTo(input_axes_data_type);
                         functions[3][index+1].forEach((it,i) => {
                             cls.append($(`<option>`).attr("id","axesCls"+index+"Type"+i).val(i).text(it));

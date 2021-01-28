@@ -212,7 +212,7 @@ module.exports = function (RED) {
                     break;
                 case "3":
                     msg.topic = "Axes Data"; 
-                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, config.axesDataType, 5) // TODO: remove last argument
+                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, config.axesDataType)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => done(error))
                     break;
@@ -230,9 +230,9 @@ module.exports = function (RED) {
                     break;
                 case "6":
                     msg.topic = "Sample Data"; 
-                    // node.endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
-                    // .then((data) => sendMsg(msg, send, done, data))
-                    // .catch((error) => done(error))
+                    node.endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
+                    .then((data) => sendMsg(msg, send, done, data))
+                    .catch((error) => done(error))
                     break;
                 case "7":
                     msg.topic = "Alarm Messages"; 
