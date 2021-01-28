@@ -19,10 +19,12 @@
             <i class="fa fa-home"></i>
             <span data-i18n="focas.config.label.ip"></span>
         </label>
-        <input type="text" style="width: 30%" id="node-config-input-cncIP" data-i18n="[placeholder]focas.config.label.ip">
+        <input type="text" id="node-config-input-cncIP" style="width: 140px;" data-i18n="[placeholder]focas.config.label.ip">
 
-        <span style="margin-left:10px" data-i18n="focas.config.label.port"></span>
-        <input type="text" id="node-config-input-cncPort" style="width: 60px;" data-i18n="[placeholder]focas.config.label.port">
+        <label for="node-config-input-cncPort" style="margin-left:10px; width: 60px">
+            <span data-i18n="focas.config.label.port"></span>
+        </label>
+        <input type="text" id="node-config-input-cncPort" style="width: 100px;" data-i18n="[placeholder]focas.config.label.port">
     </div>
 
     <div class="form-row">
@@ -31,14 +33,6 @@
             <span data-i18n="focas.config.label.timeout"></span>
         </label>
         <input type="text" style="width: 100%;" id="node-config-input-timeout"> seconds
-    </div>
-
-    <div class="form-row">
-        <label for="node-config-input-retries">
-            <i class="fa fa-repeat"></i>
-            <span data-i18n="focas.config.label.retries"></span>
-        </label>
-        <input type="text" style="width: 100%;" id="node-config-input-retries"> times
     </div>
 
     <div class="form-row">
@@ -68,60 +62,21 @@
 </script>
 
 <script type="text/html" data-help-name="focas config">
-    <!-- <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
+    <p>This node was created by <a href="https://st-one.io" target="_blank">ST-One</a></p>
     
-    <h3>Options</h3>
-    <dl class="message-properties">
-        <dt>Controller
-            <span class="property-type">IP Address</span>
-        </dt>
-        <dd> ip address of controller. </dd>
-    
-        <dt>Port
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> port of controller. </dd>
-    
-        <dt>KeepAlive
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> max time without communication. </dd>
-    
-        <dt>Timeout
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> max time without connection. </dd>
-    
-        <dt>Retries
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> retries of connection. </dd>
-    
-        <dt>Link Layer
-            <span class="property-type">Link Layer</span>
-        </dt>
-        <dd> Link Layer mode, 
-            <code>Auto</code>: auto negotiation,
-            <code>True</code>: force link layer,
-            <code>False</code>: disable link layer
-        </dd>
-    
-        <dt>Disable MID parsing
-            <span class="property-type">String</span>
-        </dt>
-        <dd> receiver MIDs with body not parsing. </dd>
-    
-        <dt>Raw Data
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> adds the parameter <code>_raw</code> in all messages, containing the message buffer. </dd>
-    
-        <dt>Generic Mode
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> the nodes use calls generics. </dd>
-    
-    </dl> -->
+    <h3>Details</h3>
+
+    <p>
+        The <b>Timeout</b> configuration sets the maximum amount of time that the CNC
+		may take to answer our requests.
+	</p>
+    <p>
+        Depending on the <b>Model</b> specified some functions may not be available due to the lack of support from the CNC.
+    </p>
+    <p>
+		It's possible to change the log level of the FOCAS communication protocol by setting the <b>Log Level</b> option
+		from "Error" to "Silly". Those logs are printed to the Node-RED console.
+	</p>
 
 </script>
 
@@ -138,14 +93,11 @@
                 required: true
             },
             cncPort: {
-                value: 4545,
-                required: true
+                value: 8193,
+                required: true,
+                validate: RED.validators.number()
             },
             timeout: {
-                value: 3,
-                required: true
-            },
-            retries: {
                 value: 3,
                 required: true
             },
@@ -172,9 +124,6 @@
             $("#node-config-input-timeout").spinner({
                 min: 3
             });
-            $("#node-config-input-retries").spinner({
-                min: 3
-            });
         }
     });
 </script>
@@ -185,14 +134,14 @@
 
 <script type="text/html" data-template-name="focas node">
 
-    <div class="form-row">
+    <div class="form-row" style="min-width: 550px">
         <label for="node-input-config">
             <i class="fa fa-cog"></i>
             <span data-i18n="focas.node.label.config"></span>
         </label>
         <input type="text" id="node-input-config" data-i18n="[placeholder]focas.node.label.config">
     </div>
-
+    
     <div class="form-row">
         <label for="node-input-function">
             <i class="fa fa-link"></i>
@@ -200,6 +149,79 @@
         </label>
         <select style="width:70%;" id="node-input-function"></select>
     </div>
+
+    <!-- Timers -->
+    <div id="timers">
+        <div class="form-row">
+            <label for="node-input-timerType">
+                <i class="fa fa-clock-o"></i>
+                <span data-i18n="focas.node.label.timeType"></span>
+            </label>
+            <select style="width:70%;" id="node-input-timerType"></select>
+        </div>
+    </div>
+
+    <!-- Axes Data -->
+    <div id="axesData">
+        <div class="form-row">
+            <label for="node-input-axesDataType">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.axesDataType"></span>
+            </label>
+            <select style="width:70%;" id="node-input-axesDataType"></select>
+        </div>
+    </div>
+
+    <!-- Parameters -->
+    <div id="parameters">
+        <div class="form-row">
+            <label for="node-input-paramNumber">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.paramNumber"></span>
+            </label>
+            <input type="text" id="node-input-paramNumber" style="width: 140px" data-i18n="[placeholder]focas.node.label.paramNumber">
+    
+            <label for="node-input-paramAxis" style="margin-left:10px; width: 60px">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.paramAxis"></span>
+            </label>
+            <input type="text" id="node-input-paramAxis" style="width: 100px" data-i18n="[placeholder]focas.node.label.paramAxis">
+        </div>
+    </div>  
+
+    <!-- Sample Data -->
+    <div id="sampleData">
+        <div class="form-row">
+            <label for="node-input-sampleDataNo">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.sampleDataNo"></span>
+            </label>
+            <input type="text" id="node-input-sampleDataNo" data-i18n="[placeholder]focas.node.label.sampleDataNo">
+        </div> 
+        <div class="form-row node-input-rule-container-row">
+            <ol id="node-input-rule-container"></ol>
+        </div>
+    </div> 
+
+    <!-- Alarms -->
+    <div id="alarms">
+        <div class="form-row">
+            <label for="node-input-almType">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.almType"></span>
+            </label>
+            <select style="width:70%" id="node-input-almType"></select>
+        </div>
+        <div class="form-row">
+            <label for="node-input-almCount">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.almCount"></span>
+            </label>
+            <input type="text" id="node-input-almCount" data-i18n="[placeholder]focas.node.label.almCount">
+        </div>
+    </div>
+
+    <br>
 
     <div class="form-row">
         <label for="node-input-name">
@@ -209,211 +231,114 @@
         <input type="text" id="node-input-name" data-i18n="[placeholder]focas.util.label.name">
     </div>
 
-    <div class="form-tips" id="div-tips">
-        <div id="code-info" style="height:auto; width:90%; font-family: monospace"></div>
-    </div>
-
-
 </script>
 
 <script type="text/html" data-help-name="focas node">
-    <!-- <p>Tool communication using OpenProtocol</p>
-    <p>This node was created by <a href="https://netsmarttech.com" target="_blank">Smart-Tech</a> as part of the <a href="https://netsmarttech.com/page/st-one" target="_blank">ST-One</a> project</p>
+    <p>Reads data from a Fanuc CNC</p>
+    <p>This node was created by <a href="https://st-one.io" target="_blank">ST-One</a></p>
 
-    <h3>Inputs</h3>
-    <dl class="message-properties">
-        <p> Use the parameters according to tips in node. </p>
-        <dt>
-            payload
-            <span class="property-type"> string | buffer | object </span>
-        </dt>
-        <dt>
-            subscribe
-            <span class="property-type"> boolean </span>
-        </dt>
-    </dl>
-    
-    <h3>Outputs</h3>
-    <ol class="node-ports">
-        <li>Feedback
-            <dl class="message-properties">
-                <dt> msg <span class="property-type"> object </object></span> </dt>
-                <dd> header of MID. </dd>
-    
-                <dt> msg.payload <span class="property-type"> object | string </object></span> </dt>
-                <dd> body of MID. </dd>
-            </dl>
+    <h3>Details</h3>
+
+    <h4><i>Parameters</i></h4>
+    <ul>
+        <li>
+            <b>Number:</b> tells which parameter to read from the CNC. The full 
+            list of parameters can be found on the CNC's Parameter Manual.
         </li>
-    
-        <li>Data
-            <p> Available in <code>subscribe</code> and <code>custom</code> options. </p>
-            <dl class="message-properties">
-                <dt> msg <span class="property-type"> object </object></span> </dt>
-                <dd> header of MID. </dd>
-    
-                <dt> msg.payload <span class="property-type"> object | string </object></span> </dt>
-                <dd> body of MID. </dd>
-            </dl>
+        <li>
+            <b>Axis:</b> must be set to <code>0</code> when there`s no axis to be specified
         </li>
-    </ol>
+    </ul>
     
-    <h3>Options</h3>
-    <dl class="message-properties">
-        <dt>Config
-            <span class="property-type">OP Controller</span>
-        </dt>
-        <dd> select controller. </dd>
+    <h4><i>Program Number</i></h4>
+    <p>
+        Reads the number of the current selected program on the CNC.
+    </p>
     
-        <dt>Mid Group
-            <span class="property-type">MID Group</span>
-        </dt>
-        <dd> select function this node. </dd>
+    <h4><i>Sample Data</i></h4>
+    <p>
+        This function samples data related to Servo and/or Spindle. The maximum number 
+        of channels for data sampling is 8. Each channel sets a different kind
+        of data to be sampled all at once. The sampling period is 1 millisecond.
+    </p>
+    <ul>
+        <li>
+            <b>No. of samples:</b> sets how many sample points are going to be read. 
+            It must be a <i>multiple of 8</i>, otherwise it will throw an error.
+        </li>
+    </ul>
     
-        <dt>Revision
-            <span class="property-type">Revision</span>
-        </dt>
-        <dd> select revision for MID Group, 
-            <code>Auto</code>: auto negotiation,
-            <code>Custom</code>: add revision not listed
-        </dd>
-    
-        <dt>Custom revision
-            <span class="property-type">Number</span>
-        </dt>
-        <dd> add number of custom revision. </dd>
-    
-        <dt>Auto Subscribe
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> active auto subscribe on start. </dd>
-    
-        <dt>Forward Errors
-            <span class="property-type">Boolean</span>
-        </dt>
-        <dd> this option adds parameter <code>msg.error</code> in error cases. </dd>
-    </dl> -->
+    <h4><i>Alarm Messages</i></h4>
+    <p>
+        Reads currently active CNC alarm messages. 
+    </p>
+    <ul>
+        <li>
+            <b>Count:</b> the amount of alarm messages to read at once. When the value set is greater than
+            the actual number of active alarms the function will end up returning all current alarm messages.
+        </li>
+    </ul>
 
 </script>
 
 <script type="text/javascript">
     (function () {
 
-        let base = {
-            "1": {
-                "text": "1 - cncStatInfo",
-                "params": []
+        let functions = [
+            {
+                "text": "Status Info"
             },
-            "2": {
-                "text": "2 - cncStatInfo2",
-                "params": []
+            {
+                "text": "System Info"
             },
-            "3": {
-                "text": "3 - cncSysInfo",
-                "params": []
+            {
+                "text": "Timers",
+                "types": ["Power on time","Operating time","Cutting time","Cycle time","Free purpose"]
             },
-            "4": {
-                "text": "4 - cncSysInfoEx",
-                "params": []
+            {
+                "text": "Axes Data",
+                "classes": ["Position","Servo","Spindle","Selected Spindle","Speed"],
+                "1": ["Absolute position", "Machine position", "Relative position", "Distance to go", "Handle interruption(Input unit)", "Handle interruption(Output unit)", "Start point of program restart", "Distance to go of program restart"], 
+                "2": ["Servo load meter (Ampere unit)", "Load current (% unit)", "Load current (Ampere unit)"], 
+                "3": ["Spindle load meter (% unit)", "Spindle motor speed (rpm unit)", "Spindle speed (param. 3799#2) (rpm unit)", "Spindle speed (motor speed) (rpm unit)", "Spindle load meter (avg. of each 250ms) (% unit)"], 
+                "4": ["Spindle load meter (% unit)", "Spindle motor speed (rpm unit)", "Spindle speed (param. 3799#2) (rpm unit)", "Spindle speed (motor speed) (rpm unit)", "Spindle load meter (avg. of each 250ms) (% unit)"], 
+                // "5": ["Feed rate (F) (Feed per minute)", "Spindle speed", "Jog speed/Dry run speed", "Tool tip speed", "Rotation speed of servo motor", "Feed rate (F/S) Note"]
             },
-            "5": {
-                "text": "5 - cncSetTimeout",
-                "params": [{"name": "timeout", 
-                            "type": "number", 
-                            "desc": "Seconds for timeout. If 0 is specified, timeout is ignored and functions wait infinity."}]
+            {
+                "text": "Parameters"
             },
-            "6": {
-                "text": "6 - cncAbsolute",
-                "params": [{"name": "axis", 
-                            "type": "number", 
-                            "desc": "Axis number to be read.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]  
+            {
+                "text": "Program Number"
             },
-            "7": {
-                "text": "7 - cncRelative",
-                "params": [{"name": "axis", 
-                            "type": "number", 
-                            "desc": "Axis number to be read.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
+            {
+                "text": "Sample Data",
+                "Servo": ["","","","","","","","","","","","","","","","","","","","","","","","","","Motor winding temperature", "Pulsecoder temperature"],
+                "Spindle": ["","","","","","","","","Motor winding temperature"]
             },
-            "8": {
-                "text": "8 - cncActs",
-                "params": []     
+            {
+                "text": "Alarm Messages",
+                "types": ["All types",
+                          "Parameter switch on (SW)",
+                          "Power off parameter set (PW)",
+                          "I/O error (IO)",
+                          "Foreground P/S (PS)",
+                          "Overtravel,External data (OT)",
+                          "Overheat alarm (OH)",
+                          "Servo alarm (SV)",
+                          "Data I/O error (SR)",
+                          "Macro alarm (MC)",
+                          "Spindle alarm (SP)",
+                          "Other alarm (DS)",
+                          "Malfunction prevent functions (IE)",
+                          "Background P/S (BG)",
+                          "Syncronized error (SN)", "", // reserved
+                          "External alarm message (EX)","","","", // reserved
+                          "PMC error (PC)"]
             },
-            "9": {
-                "text": "9 - cncActs2",
-                "params": [{"name": "sp_no", 
-                            "type": "number", 
-                            "desc": "Spindle number to be read.<br>\
-                                     1,...,n : One spindle (n = max. number of spindle).<br>\
-                                     -1 : All spindles."}]        
-            },
-            "10": {
-                "text": "10 - cncActf",
-                "params": []
-            },
-            "11": {
-                "text": "11 - cncAlarm2",
-                "params": []
-            },
-            "12": {
-                "text": "12 - cncAlmMsg",
-                "params":  [{"name": "type",
-                            "type": "number",
-                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details"},
-                            {"name": "num",
-                             "type": "number",
-                             "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."
-                            }]
-            },
-            "13": {
-                "text": "13 - cncRdtimer",
-                "params":  [{"name": "type", 
-                            "type": "number", 
-                            "desc": "<br> 0 : Power on time.<br>\
-                                          1 : Operating time.<br>\
-                                          2 : Cutting time.<br>\
-                                          3 : Cycle time.<br>\
-                                          4 : Free purpose."
-                            }]
-            },
-            "16": {
-                "text": "16 - cncRdAxisData",
-                "params": [{"name": "class", 
-                            "type": "number", 
-                            "desc": "<br> 1 : Position value.<br>\
-                                          2 : Servo.<br>\
-                                          3 : Spindle.<br>\
-                                          4 : Selected spindle.<br>\
-                                          5 : Speed."},
-                            {"name": "type", 
-                            "type": "array", 
-                            "desc": "Kind of data to be read. Refer to FOCAS documentation for more details."},
-                            {"name": "length", 
-                            "type": "number", 
-                            "desc": "The number of axes to be read."}]          
-            },
-            "18": {
-                "text": "18 - cncRdParam",
-                "params": [{"name": "param", 
-                            "type": "number", 
-                            "desc": "Parameter number to be read. Refer to CNC parameter manual for more information."},
-                            {"name": "axis", 
-                            "type": "number", 
-                            "desc": "Specify the axis number.<br>\
-                                     0 : No axis.<br>\
-                                     1,...,m : One axis (m = max. controlled axes).<br>\
-                                     -1 : All axes."}]
-            },
-            "20": {
-                "text": "20 - cncRdProgNum",
-                "params": []
-            }
-        };
+        ]
 
         RED.nodes.registerType('focas node', {
-            category: 'advanced',
+            category: 'CNC',
             color: '#ffdd00',
             defaults: {
                 name: {
@@ -426,118 +351,270 @@
                 function: {
                     value: "",
                     required: true
-                }
+                },
+                timerType: {
+                    value: ""
+                },
+                axesDataClass: {
+                    value: ""
+                },
+                axesDataType: {
+                    value: ""
+                },
+                paramNumber: {
+                    value: 6712,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "4") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
+                },
+                paramAxis: {
+                    value: 0,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "4") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
+                },
+                sampleDataNo: {
+                    value: 8,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "6") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
+                },
+                sampleDataChannels: {
+                    value: []
+                },
+                almType: {
+                    value: ""
+                },
+                almCount: {
+                    value: 1,
+                    validate: function(v) {
+                        if ($("#node-input-function").val() === "7") return /^[0-9]+$/g.test(v);
+                        return true;
+                    }
+                },
             },
             inputs: 1,
             outputs: 1,
             icon: "function.svg",
             paletteLabel: "FOCAS",
             label: function () {
-
-                if (this.name) {
+                if (this.name !== "") {
                     return this.name;
                 }
-
-                if (this.function) {
-                    var wordsArr = base[this.function].text.split(" ");
-                    return wordsArr[wordsArr.length - 1];
+                if (this.function !== "") {
+                    return functions[Number(this.function)].text;
                 } else {
                     return this._("focas.util.label.node");
                 }
-                
             },
             labelStyle: function () {
                 return this.name ? "node_label_italic" : "";
             },
             oneditprepare: function () {
 
-                let base_function = Object.keys(base);
-
                 let node = this;
 
                 const select_function = $("#node-input-function");
 
-                updateFunction();
+                const timers = $("#timers");
+                const axes_data = $("#axesData");
+                const sample_data = $("#sampleData");
+                const parameters = $("#parameters");
+                const alarms = $("#alarms");
+
+                const input_axes_data_type = $("#node-input-axesDataType");
+
+                setupInterface();
 
                 // --- Changes
-                select_function.change(() => {
-                    updateInterface();
-                    updateTips()
+                select_function.change(updateFnFields);
+                input_axes_data_type.change(function() {
+                    let selected = $(this).find(':selected');
+                    let cls = selected.closest('optgroup').attr('label');
+                    node.axesDataClass = functions[3].classes.indexOf(cls) + 1;
+                });
+
+                $("#node-input-rule-container").css('min-height','250px').editableList({
+                    addItem: _addItem,
+                    removeItem: _updateIndex,
+                    sortItems: _updateIndex,
+                    sortable: true,
+                    removable: true
+                });
+                
+                node.sampleDataChannels.forEach((item) => {
+                    $("#node-input-rule-container").editableList('addItem',item);
                 });
 
                 // --- <Begin> -- Functions ---
 
-                function updateFunction() {
-
-                    base_function.forEach(item => {
-                        select_function.append($(`<option>`).val(item).text(base[item].text));
+                function setupInterface() {
+                    
+                    functions.forEach((item, index) => {
+                        select_function.append($(`<option>`).val(index).text(item.text));
                     });
 
-                    if (node.function) {
-                        select_function.val(node.function);
-                    }
+                    if (node.function !== "") select_function.val(node.function);
+                    else select_function.val(0);
 
-                    if (select_function.val() === "") {
-                        select_function.val("1");
-                    }
-                }
-
-                function updateInterface() {
-
-                    let localFunction = select_function.val();
+                    /* ------------------- */
                     
-                    const div_tips = $("#div-tips");
+                    // Timers
+                    const input_timer_type = $("#node-input-timerType");
+                    functions[2].types.forEach((item, index) => {
+                        input_timer_type.append($(`<option>`).val(index).text(item));
+                    });
 
-                    if (!localFunction) {
-                        return;
-                    } else {
-                        div_tips.show();
+                    if (node.timerType !== "") input_timer_type.val(node.timerType);
+                    else input_timer_type.val(0);
+
+                    /* ------------------- */
+                    
+                    functions[3].classes.forEach((item,index) => {
+                        if (index === 4) return;
+                        let cls = $('<optgroup/>', { label: item }).appendTo(input_axes_data_type);
+                        functions[3][index+1].forEach((it,i) => {
+                            cls.append($(`<option>`).attr("id","axesCls"+index+"Type"+i).val(i).text(it));
+                        })
+                    });
+
+                    if (node.axesDataClass !== "") {                         
+                        $("#axesCls"+(node.axesDataClass-1)+"Type"+node.axesDataType).prop('selected',true);
+                    }
+
+                    /* ------------------- */
+
+                    // Alarms
+                    const input_alarm_type = $("#node-input-almType");
+                    functions[7].types.forEach((item, index) => {
+                        if (index === 15 || (index >= 17 && index <= 19)) return; // skips reserved positions
+                        input_alarm_type.append($(`<option>`).val(index).text(item))
+                    });
+                    
+                    if (node.almType !== "") input_alarm_type.val(node.almType); 
+                    else input_alarm_type.val(0); // All types
+
+                    // /* ------------------- */
+
+                }
+
+                function updateFnFields() {
+                    const currentFn = select_function.val();
+
+                    timers.hide();
+                    axes_data.hide();
+                    sample_data.hide();
+                    parameters.hide();
+                    alarms.hide();
+
+                    switch(currentFn) {
+                    case "2":    
+                        timers.show();
+                        break;
+                    case "3":    
+                        axes_data.show();
+                        break;
+                    case "4":    
+                        parameters.show();
+                        break;
+                    case "6":    
+                        sample_data.show();
+                        break;
+                    case "7":    
+                        alarms.show();
+                        break;
                     }
                 }
 
-                function updateTips() {
+                function _addItem(container, index, data) {
 
-                    let codeInfo = $("#code-info");
-                    let localFunction = select_function.val();
-
-                    if (!localFunction) {
+                    if (index >= 8) { // Maximum of 8 channels
+                        $("#node-input-rule-container").editableList('removeItem',data);
                         return;
                     }
-
-                    let details = base[localFunction];
-
-                    let content = "";
-
-                    if (details.params.length === 0) {
-                        content = `<h4>${details.text}<\/h4>` + node._("focas.tips.not-params");
-                        codeInfo.html(content);
-                        return;
-                    } else {
-                        content = `<h4>${details.text}<\/h4>` +
-                            node._("focas.tips.params.header") +
-                            "<code>msg.payload = {}<\/code><br>";
-
-                        details.params.forEach((value) => {
-                            let param = node._("focas.tips.params.tags.param");
-                            let type = node._("focas.tips.params.tags.type");
-                            let desc = node._("focas.tips.params.tags.description");
-
-                            let local = "<blockquote>" +
-                                `${param}: <code>msg.payload.${value.name}</code> <br>` +
-                                `${type}: <code>${value.type}</code> <br>` +
-                                `${desc}: ${value.desc}</blockquote>`;
-
-                            content = content.concat(local);
-                        });
-
-                        codeInfo.html(content);
-                        return;
+                    
+                    if (jQuery.isEmptyObject(data)) {
+                        data.axis = 1;
+                        data.type = 25;
                     }
+                    
+                    let id = Math.floor((0x99999-0x10000)*Math.random()).toString();
+                    let servoStr = "Servo";
+                    let spindleStr = "Spindle";
+                    
+                    let toggleBtns = $("<span>").addClass("button-group").appendTo(container);
 
-                    codeInfo.html("");
+                    toggleBtns.append($("<button>").attr("type","button").addClass("red-ui-button toggle btn-servo btn-group"+id).addClass(data.axis > 0 ? "selected": "").text(servoStr));
+                    toggleBtns.append($("<button>").attr("type","button").addClass("red-ui-button toggle btn-spindle btn-group"+id).addClass(data.axis < 0 ? "selected": "").text(spindleStr));
+
+                    $(".btn-group"+id).on("click", function() {
+                        $(".btn-group"+id).removeClass("selected");
+                        $(this).addClass("selected");
+                        
+                        let selectField = $(".sampleDataType"+id);
+                        
+                        if ($(this).hasClass("btn-servo")) {
+                            updateTypeField(selectField,servoStr);
+                        } else if ($(this).hasClass("btn-spindle")) {
+                            updateTypeField(selectField,spindleStr);
+                        }
+                    })
+
+                    /* ---------------------------- */
+
+                    let axisLbl = $("<label>").attr("for","node-input-sampleDataAxis"+id).width(35).text("Axis").appendTo(container);
+                    let axisField = $("<input>").attr("type","text").attr("id","node-input-sampleDataAxis"+id).addClass("sampleDataAxis").width(30).appendTo(container);
+                    axisField.val(data.axis < 0 ? -data.axis : data.axis);
+
+                    /* ---------------------------- */
+
+                    let updateTypeField = function(field,typeGroup) {
+                        field.empty();
+                        functions[6][typeGroup].forEach((item, i) => {
+                            if (item === "") return;
+                            field.append($("<option>").val(i).text(item));
+                        })
+                    }
+                    
+                    let selectField = $("<select>").css("width","180px").css("margin-left","15px").addClass("sampleDataType"+id).appendTo(container);
+                    updateTypeField(selectField, data.axis > 0 ? servoStr : spindleStr);
+                    selectField.val(data.type);
+
+                    /* ---------------------------- */
+
+                    let channelLbl = $("<span>").css("float","right").css("margin-top","10px").css("width","64px").appendTo(container);
+                    channelLbl.append(' Channel <span class="node-input-rule-index">'+(index+1)+'</span> ');
+
                 }
-
+                
+                function _updateIndex(data) {
+                    var channels = $("#node-input-rule-container").editableList('items');
+                    channels.each(function(i) {
+                        $(this).find(".node-input-rule-index").html(i+1);
+                    });
+                }
+                
                 // --- <End> -- Functions ---
+                
+            },
+            oneditsave: function() {
+                var channels = $("#node-input-rule-container").editableList('items');
+                let node = this;
+                node.sampleDataChannels = [];
+                channels.each(function(i) {
+                    let channel = {};
+                    channel.axis = Number($(this).find(".sampleDataAxis").val());
+                    channel.type = Number($(this).find("select").val());
+                    
+                    if ($(this).find(".btn-spindle").hasClass("selected")) {
+                        channel.axis = -channel.axis; // Spindle axis numbers are negative (according to FOCAS)
+                    }
+                    
+                    node.sampleDataChannels.push(channel);
+                });
             }
         });
 
