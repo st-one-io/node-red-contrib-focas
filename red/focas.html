@@ -401,17 +401,14 @@
             icon: "function.svg",
             paletteLabel: "FOCAS",
             label: function () {
-
-                if (this.name) {
+                if (this.name !== "") {
                     return this.name;
                 }
-
-                if (this.function) {
-                    return functions[this.function].text;
+                if (this.function !== "") {
+                    return functions[Number(this.function)].text;
                 } else {
                     return this._("focas.util.label.node");
                 }
-                
             },
             labelStyle: function () {
                 return this.name ? "node_label_italic" : "";
