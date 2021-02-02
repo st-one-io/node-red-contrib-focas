@@ -302,7 +302,7 @@
                 "2": ["Servo load meter (percentage)", "Load current (percentage)", "Load current (ampere)"], 
                 "3": ["Spindle load meter (percentage)", "Spindle motor speed (rpm)", "Spindle speed (param. 3799#2) (rpm)", "Spindle speed (motor speed) (rpm)", "Spindle load meter (avg. of each 250ms) (percentage)"], 
                 "4": ["Spindle load meter (percentage)", "Spindle motor speed (rpm)", "Spindle speed (param. 3799#2) (rpm)", "Spindle speed (motor speed) (rpm)", "Spindle load meter (avg. of each 250ms) (percentage)"], 
-                // "5": ["Feed rate (F) (Feed per minute)", "Spindle speed", "Jog speed/Dry run speed", "Tool tip speed", "Rotation speed of servo motor", "Feed rate (F/S) Note"]
+                "5": ["Feed rate (F) (Feed per minute)", "Spindle speed", "Jog speed/Dry run speed"]
             },
             {
                 "text": "Parameters"
@@ -474,7 +474,6 @@
                     /* ------------------- */
                     
                     functions[3].classes.forEach((item,index) => {
-                        if (index === 4) return;
                         let cls = $('<optgroup/>', { label: item }).appendTo(input_axes_data_type);
                         functions[3][index+1].forEach((it,i) => {
                             cls.append($(`<option>`).attr("id","axesCls"+index+"Type"+i).val(i).text(it));
