@@ -180,7 +180,6 @@ module.exports = function (RED) {
         node.endpoint.on('__STATUS__', node.onEndpointStatus);
 
         function sendMsg(msg, send, done, data) {
-            delete data.error;
             msg.payload = data;
             send(msg);
             done();
