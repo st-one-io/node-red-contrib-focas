@@ -71,9 +71,6 @@
 		may take to answer our requests.
 	</p>
     <p>
-        Depending on the <b>Model</b> specified some functions may not be available due to the lack of support from the CNC.
-    </p>
-    <p>
 		It's possible to change the log level of the FOCAS communication protocol by setting the <b>Log Level</b> option
 		from "Error" to "Silly". Those logs are printed to the Node-RED console.
 	</p>
@@ -233,47 +230,114 @@
     <p>Reads data from a Fanuc CNC</p>
     <p>This node was created by <a href="https://st-one.io" target="_blank">ST-One</a></p>
 
+    
+    <h3>Outputs</h3>
+    <dl class="message-properties">
+        <dt>topic<span class="property-type">string</span></dt>
+		<dd>
+			The name of the "Function" called.
+		</dd>
+        
+        <dt>payload<span class="property-type">any</span></dt>
+		<dd>
+			The value(s) returned from the CNC. The format and type of the payload
+			depends on the configured "Function".
+		</dd>
+    </dl>
+    
+    
     <h3>Details</h3>
 
-    <h4><i>Parameters</i></h4>
-    <ul>
-        <li>
-            <b>Number:</b> tells which parameter to read from the CNC. The full 
-            list of parameters can be found on the CNC's Parameter Manual.
-        </li>
-        <li>
-            <b>Axis:</b> must be set to <code>0</code> when there`s no axis to be specified
-        </li>
-    </ul>
-    
-    <h4><i>Program Number</i></h4>
-    <p>
-        Reads the number of the current selected program on the CNC.
-    </p>
-    
-    <h4><i>Sample Data</i></h4>
-    <p>
-        This function samples data related to Servo and/or Spindle. The maximum number 
-        of channels for data sampling is 8. Each channel sets a different kind
-        of data to be sampled all at once. The sampling period is 1 millisecond.
-    </p>
-    <ul>
-        <li>
-            <b>No. of samples:</b> sets how many sample points are going to be read. 
-            It must be a <i>multiple of 8</i>, otherwise it will throw an error.
-        </li>
-    </ul>
-    
-    <h4><i>Alarm Messages</i></h4>
-    <p>
-        Reads currently active CNC alarm messages. 
-    </p>
-    <ul>
-        <li>
-            <b>Count:</b> the amount of alarm messages to read at once. When the value set is greater than
-            the actual number of active alarms the function will end up returning all current alarm messages.
-        </li>
-    </ul>
+    All functions and their parameters are described below.
+
+    <dl class="message-properties">
+        <dt>System info</dt>
+		<dd>
+			Reads status information of CNC.
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Status info</dt>
+		<dd>
+			Reads system information such as kind of CNC system, Machining(M) or Turning(T), series and version of CNC system software and number of controlled axes.
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Timers</dt>
+		<dd>
+			Gets cutting time, cycle time, and other timer data of CNC.
+            <ul>
+                <li>
+                    <i>Type:</i> The kind of timer to be read.
+                </li>
+            </ul>
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Axes Data</dt>
+		<dd>
+			Reads various data related to servo/spindle axis.
+            <ul>
+                <li>
+                    <i>Type:</i> The kind of data to be read (grouped in 5 different classes).
+                </li>
+            </ul>
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Parameters</dt>
+		<dd>
+			Reads the parameter specified.
+            <ul>
+                <li>
+                    <i>Number:</i> tells which parameter to read from the CNC. The full 
+                    list of parameters can be found on the CNC's Parameter Manual.
+                </li>
+                <li>
+                    <i>Axis:</i> must be set to <code>0</code> when there`s no axis to be specified
+                </li>
+            </ul>
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Program Number</dt>
+		<dd>
+			Reads the number of the current selected program on the CNC.
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Sample Data</dt>
+		<dd>
+			This function samples data related to Servo and/or Spindle. The maximum number 
+            of channels for data sampling is 8. Each channel sets a different kind
+            of data to be sampled all at once. The sampling period is 1 millisecond.
+            <ul>
+                <li>
+                    <i>No. of samples:</i> sets how many sample points are going to be read. 
+                    It must be a multiple of 8, otherwise it will throw an error.
+                </li>
+            </ul>
+		</dd>
+    </dl>
+
+    <dl class="message-properties">
+        <dt>Alarm Messages</dt>
+		<dd>
+			Reads currently active CNC alarm messages.
+            <ul>
+                <li>
+                    <i>Count:</i> the amount of alarm messages to read at once. When the value set is greater than
+                    the actual number of active alarms the function will end up returning all current alarm messages.
+                </li>
+            </ul>
+		</dd>
+    </dl>
 
 </script>
 
