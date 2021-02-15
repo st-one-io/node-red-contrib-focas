@@ -35,7 +35,7 @@
         <input type="text" style="width: 100%;" id="node-config-input-timeout"> seconds
     </div>
 
-    <div class="form-row">
+    <!-- <div class="form-row">
         <label for="node-config-input-cncModel">
             <i class="fa fa-link"></i>
             <span data-i18n="focas.config.label.models"></span>
@@ -43,7 +43,7 @@
         <select type="text" id="node-config-input-cncModel">
             <option value="0i-D">0i-D</option>
         </select>
-    </div>
+    </div> -->
 
     <div class="form-row">
         <label for="node-config-input-logLevel">
@@ -101,10 +101,6 @@
                 value: 3,
                 required: true
             },
-            cncModel: {
-                value: "0i-D",
-                required: true
-            },
             logLevel: {
                 value: "error",
                 required: true
@@ -116,7 +112,7 @@
                 return this.name;
             }
 
-            let name = this.cncModel + "@" + this.cncIP;
+            let name = this.cncIP;
 
             return name;
         },
