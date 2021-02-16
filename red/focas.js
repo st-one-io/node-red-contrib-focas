@@ -180,9 +180,14 @@ module.exports = function (RED) {
         node.endpoint.on('__STATUS__', node.onEndpointStatus);
 
         function sendMsg(msg, send, done, data) {
+            // If this node is installed in Node-RED 0.x, it will need to
+            // fallback to using `node.send`
+            send = send || function() { node.send.apply(node,arguments) }
             msg.payload = data;
             send(msg);
-            done();
+            if (done) {
+                done();
+            }
         }
 
 
