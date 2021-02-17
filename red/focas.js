@@ -119,7 +119,9 @@ module.exports = function (RED) {
                 node.onDestroy = true;
                 
                 node.removeListeners();
-                await node.focas.destroy();
+                await node.focas.destroy().catch((err) => {
+                    node.error(err);
+                });
                 node.focas = null; 
 
                 node.onDestroy = false;
@@ -153,7 +155,9 @@ module.exports = function (RED) {
             
             if(node.focas) {
                 node.removeListeners();
-                await node.focas.destroy();
+                await node.focas.destroy().catch((err) => {
+                    node.error(err);
+                });;
                 node.focas = null;
             }
 
