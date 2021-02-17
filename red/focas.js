@@ -50,6 +50,8 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         let node = this;
 
+        node.setMaxListeners(0);
+
         node.cncIP = config.cncIP;
         node.cncPort = Number(config.cncPort);
         node.timeout = config.timeout * 1000;
