@@ -196,6 +196,14 @@ module.exports = function (RED) {
             }
         }
 
+        function onError(msg, done, error) {
+            if (done) {
+                done(error);
+            } else {
+                node.error(error, msg);
+            }
+        }
+
 
         node.on('input', (msg, send, done) => {
             
@@ -206,49 +214,50 @@ module.exports = function (RED) {
                     msg.topic = "Status Info"; 
                     node.endpoint.focas.cncStatInfo()
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "1":
                     msg.topic = "System Info";     
                     node.endpoint.focas.cncSysInfo()
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "2":
                     msg.topic = "Timers";     
                     node.endpoint.focas.cncRdTimer(config.timerType)
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "3":
                     msg.topic = "Axes Data"; 
-                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, config.axesDataType)
+                    let type = [parseInt(config.axesDataType)];
+                    node.endpoint.focas.cncRdAxisData(config.axesDataClass, type)
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "4":
                     msg.topic = "Parameters"; 
                     node.endpoint.focas.cncRdParam(config.paramNumber, config.paramAxis)
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "5":
                     msg.topic = "Program Number"; 
                     node.endpoint.focas.cncRdProgNum()
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "6":
                     msg.topic = "Sample Data"; 
                     node.endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 case "7":
                     msg.topic = "Alarm Messages"; 
                     node.endpoint.focas.cncRdAlmMsg2(config.almType - 1 , config.almCount)
                     .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => done(error))
+                    .catch((error) => onError(msg,done,error))
                     break;
                 default:
                     RED._('focas.function.unknown');
