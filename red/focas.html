@@ -372,8 +372,53 @@
             },
             {
                 "text": "Sample Data",
-                "Servo": ["","","","","","","","","","","","","","","","","","","","","","","","","","Motor winding temperature", "Pulsecoder temperature"],
-                "Spindle": ["","","","","","","","","Motor winding temperature"]
+                "Servo": ["Summation of position feedback pulse data (POSF)",
+                          "Position error (ERR)",
+                          "Velocity command (VCMD)",
+                          "Torque command (TCMD)",
+                          "Speed feedback signal (SPEED)",
+                          "Estimated disturbance torque (DTRQ)",
+                          "Synchronous error on rigid tapping (SYNC)",
+                          "OVC simulation data (OVCLV)",
+                          "Effective current (IEFF)",
+                          "DC link voltage(VDC)",
+                          "Semi-Full error(SFERR)",
+                          "Analog signal command(ALGCMD)",
+                          "Analog signal feedback(ALGFB)",
+                          "R-phase current(IR)",
+                          "R-phase current(PDM slave1)(IR1)",
+                          "R-phase current(PDM slave2)(IR2)",
+                          "R-phase current(PDM slave3)(IR3)",
+                          "R-phase current(PDM slave4)(IR4)",
+                          "S-phase current(IS)",
+                          "S-phase current(PDM slave1)(IS1)",
+                          "S-phase current(PDM slave2)(IS2)",
+                          "S-phase current(PDM slave3)(IS3)",
+                          "S-phase current(PDM slave4)(IS4)",
+                          "Reactive current(ID)",
+                          "Active current(IQ)",
+                          "Motor winding temperature(MTTMP)",
+                          "Pulsecoder temperature(PCTMP)",
+                          "Velocity command without FF(VCOUT)",
+                          "Advanced velocity command(VCC0)",
+                          "Backlash acceleration amount(BLACL)",
+                          "Absolute position detected internal pulse coder(ABS)",
+                          "Vibration frequency(FREQ)",
+                          "Vibration torque command(FRTCM)",
+                          "DC link voltage(VDC)"],
+                "Spindle": ["Summation of position feedback pulse data (CSPOS)",
+                            "Moter speed (SPEED)",
+                            "Torque command (TCMD)",
+                            "Moter speed command (VCMD)",
+                            "Position error (ERR)",
+                            "Load meter data (LMDAT)",
+                            "Spindle load torque (DTRQ)",
+                            "Amplitude of moter current (INORM)",
+                            "Motor winding temperature (MTTMP)",
+                            "Spindle axis power consumption(EPMTR)",
+                            "Frequency of disturbance torque(FREQ)",
+                            "Gain data(GAIN)",
+                            "Torque command 2(TCMD2)"]
             },
             {
                 "text": "Alarm Messages",
@@ -633,7 +678,6 @@
                     let updateTypeField = function(field,typeGroup) {
                         field.empty();
                         functions[6][typeGroup].forEach((item, i) => {
-                            if (item === "") return;
                             field.append($("<option>").val(i).text(item));
                         })
                     }
