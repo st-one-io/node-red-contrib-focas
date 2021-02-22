@@ -476,7 +476,7 @@
                 paramAxis: {
                     value: 0,
                     validate: function(v) {
-                        if ($("#node-input-function").val() === "4") return /^[0-9]+$/g.test(v);
+                        if ($("#node-input-function").val() === "4") return /^(-1$||[0-9])+$/g.test(v);
                         return true;
                     }
                 },
