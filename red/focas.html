@@ -483,7 +483,7 @@
                 sampleDataNo: {
                     value: 8,
                     validate: function(v) {
-                        if ($("#node-input-function").val() === "6") return /^[0-9]+$/g.test(v);
+                        if ($("#node-input-function").val() === "6") return /^[0-9]+$/g.test(v) && !(v%8);
                         return true;
                     }
                 },
