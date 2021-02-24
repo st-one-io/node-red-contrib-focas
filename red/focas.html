@@ -536,11 +536,6 @@
 
                 // --- Changes
                 select_function.change(updateFnFields);
-                input_axes_data_type.change(function() {
-                    let selected = $(this).find(':selected');
-                    let cls = selected.closest('optgroup').attr('label');
-                    node.axesDataClass = functions[3].classes.indexOf(cls) + 1;
-                });
 
                 $("#node-input-rule-container").css('min-height','250px').editableList({
                     addItem: _addItem,
@@ -704,9 +699,9 @@
                 
             },
             oneditsave: function() {
-                var channels = $("#node-input-rule-container").editableList('items');
-                let node = this;
-                node.sampleDataChannels = [];
+                let channels = $("#node-input-rule-container").editableList('items');
+                let that = this;
+                that.sampleDataChannels = [];
                 channels.each(function(i) {
                     let channel = {};
                     channel.axis = Number($(this).find(".sampleDataAxis").val());
@@ -716,8 +711,12 @@
                         channel.axis = -channel.axis; // Spindle axis numbers are negative (according to FOCAS)
                     }
                     
-                    node.sampleDataChannels.push(channel);
+                    that.sampleDataChannels.push(channel);
                 });
+
+                let selected = $("#node-input-axesDataType").find(':selected');
+                let cls = selected.closest('optgroup').attr('label');
+                that.axesDataClass = functions[3].classes.indexOf(cls) + 1;
             }
         });
 
