@@ -4,7 +4,7 @@
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
 
-const FocasEndpoint = require('node-focas');
+const FocasEndpoint = require('@protocols/node-focas');
 
 module.exports = function (RED) {
     // ----------- Focas Endpoint -----------

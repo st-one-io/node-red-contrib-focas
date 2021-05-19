@@ -26,5 +26,8 @@
     "nodes": {
       "focas": "red/focas.js"
     }
+  },
+  "dependencies": {
+    "@protocols/node-focas": "^1.0.0"
   }
 }
