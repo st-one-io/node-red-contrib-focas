@@ -251,21 +251,21 @@
     All functions and their parameters are described below.
 
     <dl class="message-properties">
-        <dt>System info</dt>
+        <dt><strong>System info</strong></dt>
 		<dd>
 			Reads status information of CNC.
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt>Status info</dt>
+        <dt><strong>Status info</strong></dt>
 		<dd>
 			Reads system information such as kind of CNC system, Machining(M) or Turning(T), series and version of CNC system software and number of controlled axes.
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt>Timers</dt>
+        <dt><strong>Timers</strong></dt>
 		<dd>
 			Gets cutting time, cycle time, and other timer data of CNC.
             <ul>
@@ -277,7 +277,7 @@
     </dl>
 
     <dl class="message-properties">
-        <dt>Axes Data</dt>
+        <dt><strong>Axes Data</strong></dt>
 		<dd>
 			Reads various data related to servo/spindle axis.
             <ul>
@@ -289,13 +289,13 @@
     </dl>
 
     <dl class="message-properties">
-        <dt>Parameters</dt>
+        <dt><strong>Parameters</strong></dt>
 		<dd>
 			Reads the parameter specified.
             <ul>
                 <li>
-                    <i>Number:</i> tells which parameter to read from the CNC. The full 
-                    list of parameters can be found on the CNC's Parameter Manual.
+                    <i>Number:</i> tells which parameter to read from the CNC. <u>The full 
+                    list of parameters can be found on the CNC's Parameter Manual for each CNC model.</u>
                 </li>
                 <li>
                     <i>Axis:</i> must be set to <code>0</code> when there`s no axis to be specified
@@ -305,29 +305,35 @@
     </dl>
 
     <dl class="message-properties">
-        <dt>Program Number</dt>
+        <dt><strong>Program Number</strong></dt>
 		<dd>
 			Reads the number of the current selected program on the CNC.
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt>Sample Data</dt>
+        <dt><strong>Sample Data</strong></dt>
 		<dd>
 			This function samples data related to Servo and/or Spindle. The maximum number 
             of channels for data sampling is 8. Each channel sets a different kind
             of data to be sampled all at once. The sampling period is 1 millisecond.
+            <u> 
+                Disclaimer: On February 28 of 2018 this function was removed from the original 
+                FOCAS 1/2 Library by FANUC and never put back again. It has a very unpredictable 
+                behaviour and has already caused CNCs to completely freeze, so use it at your own risk!
+            </u>
             <ul>
                 <li>
                     <i>No. of samples:</i> sets how many sample points are going to be read. 
                     It must be a multiple of 8, otherwise it will throw an error.
                 </li>
             </ul>
+
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt>Alarm Messages</dt>
+        <dt><strong>Alarm Messages</strong></dt>
 		<dd>
 			Reads currently active CNC alarm messages.
             <ul>
