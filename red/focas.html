@@ -251,21 +251,21 @@
     All functions and their parameters are described below.
 
     <dl class="message-properties">
-        <dt><strong>System info</strong></dt>
+        <dt>System info</dt>
 		<dd>
 			Reads status information of CNC.
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Status info</strong></dt>
+        <dt>Status info</dt>
 		<dd>
 			Reads system information such as kind of CNC system, Machining(M) or Turning(T), series and version of CNC system software and number of controlled axes.
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Timers</strong></dt>
+        <dt>Timers</dt>
 		<dd>
 			Gets cutting time, cycle time, and other timer data of CNC.
             <ul>
@@ -277,7 +277,7 @@
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Axes Data</strong></dt>
+        <dt>Axes Data</dt>
 		<dd>
 			Reads various data related to servo/spindle axis.
             <ul>
@@ -289,7 +289,7 @@
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Parameters</strong></dt>
+        <dt>Parameters</dt>
 		<dd>
 			Reads the parameter specified.
             <ul>
@@ -305,23 +305,23 @@
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Program Number</strong></dt>
+        <dt>Program Number</dt>
 		<dd>
 			Reads the number of the current selected program on the CNC.
 		</dd>
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Sample Data</strong></dt>
+        <dt>Sample Data</dt>
 		<dd>
 			This function samples data related to Servo and/or Spindle. The maximum number 
             of channels for data sampling is 8. Each channel sets a different kind
             of data to be sampled all at once. The sampling period is 1 millisecond.
-            <u> 
+            <strong><i> 
                 Disclaimer: On February 28 of 2018 this function was removed from the original 
                 FOCAS 1/2 Library by FANUC and never put back again. It has a very unpredictable 
                 behaviour and has already caused CNCs to completely freeze, so use it at your own risk!
-            </u>
+            </i></strong>
             <ul>
                 <li>
                     <i>No. of samples:</i> sets how many sample points are going to be read. 
@@ -333,7 +333,7 @@
     </dl>
 
     <dl class="message-properties">
-        <dt><strong>Alarm Messages</strong></dt>
+        <dt>Alarm Messages</dt>
 		<dd>
 			Reads currently active CNC alarm messages.
             <ul>
