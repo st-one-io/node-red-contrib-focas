@@ -48,7 +48,7 @@
                 "default": "Error",
                 "socket": "Socket Error. Check if machine is reachable",
                 "closed":"Connectin closed due to an unkown error",
-                "timeout": "Socket timeout. Check your connection connection"
+                "timeout": "Socket timeout. Check your connection"
             },
             "functions": {
                 "unknown": "ERR_UN_FN - An unknown function was called"
