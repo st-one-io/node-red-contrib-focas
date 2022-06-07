@@ -74,12 +74,17 @@ module.exports = function (RED) {
                 this.retryTimeout = null;
             }
 
+            if (this.focas) {
+                this.focas.removeAllListeners()
+                this.focas = null;
+            }
+
             this.focas = new FocasEndpoint({address: this.cncIP, port: this.cncPort, timeout: this.timeout});  
             
-            this.focas.on('error', onError);
-            this.focas.on('timeout', onTimeout);
-            this.focas.on('connected', manageStatus('online'));
-            this.focas.on('disconnected', onDisconnected);
+            this.focas.on('error', error => this.onError(error));
+            this.focas.on('timeout', error => this.onTimeout(error));
+            this.focas.on('connected', () => this.manageStatus('online'));
+            this.focas.on('disconnected', error => this.onDisconnected(error));
 
             this.focas.connect();
         }
@@ -90,11 +95,6 @@ module.exports = function (RED) {
         }
 
         this.onDisconnected = () => {
-            if (this.focas) {
-                this.focas.removeAllListeners()
-                this.focas = null;
-            }
-
             if (this.onCloseCallback) {
                 this.onCloseCallback()
                 return
@@ -138,8 +138,8 @@ module.exports = function (RED) {
         var statusVal;
         let endpoint = RED.nodes.getNode(config.config);
 
-        function onEndpointStatus(s) {
-            node.status(generateStatus(s.status, statusVal));
+        function onEndpointStatus(status) {
+            node.status(generateStatus(status, statusVal));
         }
 
         endpoint.on('__STATUS__', onEndpointStatus);
