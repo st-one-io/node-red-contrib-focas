@@ -7,41 +7,33 @@ const FocasEndpoint = require('@protocols/node-focas');
 module.exports = function (RED) {
     
     // ----------- Focas Endpoint -----------
-    function generateStatus(status, val) {
-        var obj;
-        if (typeof val != 'string' && typeof val != 'number' && typeof val != 'boolean') {
-            val = RED._('focas.endpoint.status.online');
-        }
+    function generateStatus(status) {
         switch (status) {
             case 'online':
-                obj = {
+                return {
                     fill: 'green',
                     shape: 'dot',
-                    text: val.toString()
+                    text: RED._('focas.endpoint.status.online')
                 };
-                break;
             case 'offline':
-                obj = {
+                return {
                     fill: 'red',
                     shape: 'dot',
                     text: RED._('focas.endpoint.status.offline')
                 };
-                break;
             case 'connecting':
-                obj = {
+                return {
                     fill: 'yellow',
                     shape: 'dot',
                     text: RED._('focas.endpoint.status.connecting')
                 };
-                break;
             default:
-                obj = {
+                return {
                     fill: 'grey',
                     shape: 'dot',
                     text: RED._('focas.endpoint.status.unknown')
                 };
         }
-        return obj;
     }
 
     function FocasConfig(config) {
@@ -133,11 +125,10 @@ module.exports = function (RED) {
 
         RED.nodes.createNode(this, config);
         let node = this;
-        var statusVal;
         let endpoint = RED.nodes.getNode(config.config);
 
         function onEndpointStatus(status) {
-            node.status(generateStatus(status, statusVal));
+            node.status(generateStatus(status));
         }
 
         endpoint.on('__STATUS__', onEndpointStatus);
