@@ -1,15 +1,10 @@
-//@ts-check
 /*
   Copyright: (c) 2018-2021, ST-One
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
-
-//@ts-ignore
 const FocasEndpoint = require('@protocols/node-focas');
 
 module.exports = function (RED) {
-    
-    let focas = null;
     
     // ----------- Focas Endpoint -----------
     function generateStatus(status, val) {
@@ -49,112 +44,87 @@ module.exports = function (RED) {
         return obj;
     }
 
-    // <Begin> --- Config ---
     function FocasConfig(config) {
         RED.nodes.createNode(this, config);
-        let node = this;
 
         this.setMaxListeners(0);
 
-        let cncIP = config.cncIP;
-        let cncPort = Number(config.cncPort);
-        let timeout = config.timeout * 1000;
-        //let cncModel = config.cncModel;
-        let logLevel = config.logLevel;
+        this.cncIP = config.cncIP;
+        this.cncPort = Number(config.cncPort);
+        this.timeout = config.timeout * 1000;
 
-        let connectionStatus = 'unknown';
-        let retryTimeout = null;
+        this.connectionStatus = 'unknown';
+        this.retryTimeout = null;
+        this.onCloseCallback = null;
 
-        function manageStatus(newStatus) {
-            if (connectionStatus == newStatus) return;
+        this.focas = null;
 
-            connectionStatus = newStatus;
-            node.emit('__STATUS__', {
-                status: connectionStatus
-            });
+        this.manageStatus = (newStatus) => {
+            if (this.connectionStatus === newStatus) return;
+
+            this.connectionStatus = newStatus;
+            this.emit('__STATUS__', this.connectionStatus);
         }
 
-        async function disconnect(reconnect = true) {
-            manageStatus('offline');
+        this.connect = () => {
+            this.manageStatus('connecting');
 
-            if (!reconnect) {
-                clearTimeout(retryTimeout);
-                retryTimeout = null;
+            if (this.retryTimeout) {
+                clearTimeout(this.retryTimeout)
+                this.retryTimeout = null;
             }
+
+            this.focas = new FocasEndpoint({address: this.cncIP, port: this.cncPort, timeout: this.timeout});  
             
-            if (focas != null) {
-                if (!reconnect) focas.removeListener('disconnected', onDisconnect);
-                await focas.destroy();
-                removeListeners();
-                focas = null; 
-            }
+            this.focas.on('error', onError);
+            this.focas.on('timeout', onTimeout);
+            this.focas.on('connected', manageStatus('online'));
+            this.focas.on('disconnected', onDisconnected);
 
-            return;
+            this.focas.connect();
         }
-        
-        async function connect() {
 
-            if (retryTimeout != null) {
-                clearTimeout(retryTimeout);
-                retryTimeout = null;
+        this.disconnect = () => {
+            this.manageStatus('offline');
+            this.focas.destroy()
+        }
+
+        this.onDisconnected = () => {
+            if (this.focas) {
+                this.focas.removeAllListeners()
+                this.focas = null;
             }
+
+            if (this.onCloseCallback) {
+                this.onCloseCallback()
+                return
+            } 
             
-            if (focas != null) {
-                await disconnect();
-            }
-
-            manageStatus('connecting');
-            focas = new FocasEndpoint({address: cncIP, port: cncPort, timeout: timeout, log: true, logLevel: logLevel});  
-            
-            focas.on('error', onError);
-            focas.on('timeout', onTimeout);
-            focas.on('connected', onConnect);
-            focas.on('disconnected', onDisconnect);
-
-            await focas.connect();
-        };
-
-        function onConnect() {
-            manageStatus('online');
-        };
-
-        function onDisconnect() {
-            node.error(new Error('Disconnected from device'));
-            if (retryTimeout == null) {
-                retryTimeout = setTimeout(connect, 10000);
-                node.warn(RED._('focas.info.reconnect'));
+            if (!this.retryTimeout) {
+                this.retryTimeout = setTimeout(this.connect, 8000)
+                this.warn(RED._('focas.info.reconnect'));
             }
         }
 
-        function onTimeout() {
-            onError(RED._('focas.endpoint.error.timeout'));
+        this.onTimeout = () => {
+            this.onError(RED._('focas.endpoint.error.timeout'));
         }
 
-        async function onError(e) {
-            node.error(e);
-            disconnect();
+        this.onError = (error) => {
+            this.error(error);
+            this.disconnect();
         };
         
-        this.on('__GET_STATUS__', function() {
-            node.emit('__STATUS__', {
-                status: connectionStatus
-            });
+        this.on('__GET_STATUS__', () => {
+            this.emit('__STATUS__', this.connectionStatus);
         });
 
-        function removeListeners() {
-            if (focas == null) return;
-            focas.removeListener('error',onError);
-            focas.removeListener('connected', onConnect);
-            focas.removeListener('disconnected', onDisconnect);
-            focas.removeListener('timeout', onTimeout);
-        };
-
-        this.on('close', async (done) => {
-            await disconnect(false);
-            done();
+        this.on('close', (done) => {
+            this.onCloseCallback = done;
+            this.disconnect();
         });
 
-        connect();
+        this.connect();
     }
 
     RED.nodes.registerType('focas config', FocasConfig);
@@ -201,50 +171,50 @@ module.exports = function (RED) {
             switch(fn) {
                 case "0":
                     msg.topic = "Status Info"; 
-                    focas.cncStatInfo()
+                    endpoint.focas.cncStatInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "1":
                     msg.topic = "System Info";     
-                    focas.cncSysInfo()
+                    endpoint.focas.cncSysInfo()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "2":
                     msg.topic = "Timers";     
-                    focas.cncRdTimer(config.timerType)
+                    endpoint.focas.cncRdTimer(config.timerType)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "3":
                     msg.topic = "Axes Data"; 
                     let type = [parseInt(config.axesDataType)];
-                    focas.cncRdAxisData(config.axesDataClass, type)
+                    endpoint.focas.cncRdAxisData(config.axesDataClass, type)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "4":
                     msg.topic = "Parameters"; 
-                    focas.cncRdParam(config.paramNumber, config.paramAxis)
+                    endpoint.focas.cncRdParam(config.paramNumber, config.paramAxis)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "5":
                     msg.topic = "Program Number"; 
-                    focas.cncRdProgNum()
+                    endpoint.focas.cncRdProgNum()
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "6":
                     msg.topic = "Sample Data"; 
-                    focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
+                    endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
                 case "7":
                     msg.topic = "Alarm Messages"; 
-                    focas.cncRdAlmMsg2(config.almType - 1 , config.almCount)
+                    endpoint.focas.cncRdAlmMsg2(config.almType - 1 , config.almCount)
                     .then((data) => sendMsg(msg, send, done, data))
                     .catch((error) => onError(msg,done,error))
                     break;
