@@ -47,8 +47,6 @@ module.exports = function (RED) {
     function FocasConfig(config) {
         RED.nodes.createNode(this, config);
 
-        this.setMaxListeners(0);
-
         this.cncIP = config.cncIP;
         this.cncPort = Number(config.cncPort);
         this.timeout = config.timeout * 1000;
