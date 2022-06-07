@@ -59,15 +59,7 @@ module.exports = function (RED) {
         this.connect = () => {
             this.manageStatus('connecting');
 
-            if (this.retryTimeout) {
-                clearTimeout(this.retryTimeout)
-                this.retryTimeout = null;
-            }
-
-            if (this.focas) {
-                this.focas.removeAllListeners()
-                this.focas = null;
-            }
+            this.clear();
 
             this.focas = new FocasEndpoint({address: this.cncIP, port: this.cncPort, timeout: this.timeout});  
             
@@ -79,6 +71,18 @@ module.exports = function (RED) {
             this.focas.connect();
         }
 
+        this.clear = () => {
+            if (this.focas) {
+                this.focas.removeAllListeners()
+                this.focas = null;
+            }
+            
+            if (this.retryTimeout) {
+                clearTimeout(this.retryTimeout)
+                this.retryTimeout = null;
+            }
+        }
+
         this.disconnect = () => {
             this.manageStatus('offline');
             this.focas.destroy()
@@ -86,7 +90,8 @@ module.exports = function (RED) {
 
         this.onDisconnected = () => {
             if (this.onCloseCallback) {
-                this.onCloseCallback()
+                this.clear();
+                this.onCloseCallback();
                 return
             } 
             
