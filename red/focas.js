@@ -104,10 +104,6 @@ module.exports = function (RED) {
             this.error(error);
             this.disconnect();
         };
-        
-        this.on('__GET_STATUS__', () => {
-            this.emit('__STATUS__', this.connectionStatus);
-        });
 
         this.on('close', (done) => {
             this.onCloseCallback = done;
@@ -124,92 +120,89 @@ module.exports = function (RED) {
     function FocasNode(config) {
 
         RED.nodes.createNode(this, config);
-        let node = this;
-        let endpoint = RED.nodes.getNode(config.config);
+        const endpoint = RED.nodes.getNode(config.config);
 
-        function onEndpointStatus(status) {
-            node.status(generateStatus(status));
+        this.onEndpointStatus = (status) => {
+            this.status(generateStatus(status));
         }
 
-        endpoint.on('__STATUS__', onEndpointStatus);
-        endpoint.emit('__GET_STATUS__');
+        endpoint.on('__STATUS__', status => this.onEndpointStatus(status));
+        this.onEndpointStatus(endpoint.connectionStatus);
 
-        function sendMsg(msg, send, done, data) {
+        this.sendMsg = (msg, send, done, data) => {
             // If this node is installed in Node-RED 0.x, it will need to
             // fallback to using `node.send`
-            send = send || function() { node.send.apply(node,arguments) }
+            send = send || (() => { this.send.apply(this,arguments) })
             msg.payload = data;
             send(msg);
-            if (done) {
-                done();
-            }
+            if (done) done();
         }
 
-        function onError(msg, done, error) {
-            if (done) {
-                done(error);
-            } else {
-                node.error(error, msg);
-            }
+        this.onError = (msg, done, error) => {
+            if (done) done(error);
+            else this.error(error, msg);
         }
 
         this.on('input', (msg, send, done) => {
             
-            let fn = (config.function) ? config.function : msg.fn;
-            //let params = (msg.payload) ? msg.payload : null;
+            if (endpoint.connectionStatus !== 'online' ) {
+                this.onError(msg, done, RED._('focas.endpoint.error.offline'))
+                return
+            }
+            
+            const fn = config.function || msg.fn;
             switch(fn) {
                 case "0":
                     msg.topic = "Status Info"; 
                     endpoint.focas.cncStatInfo()
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "1":
                     msg.topic = "System Info";     
                     endpoint.focas.cncSysInfo()
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "2":
                     msg.topic = "Timers";     
                     endpoint.focas.cncRdTimer(config.timerType)
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "3":
                     msg.topic = "Axes Data"; 
                     let type = [parseInt(config.axesDataType)];
                     endpoint.focas.cncRdAxisData(config.axesDataClass, type)
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "4":
                     msg.topic = "Parameters"; 
                     endpoint.focas.cncRdParam(config.paramNumber, config.paramAxis)
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "5":
                     msg.topic = "Program Number"; 
                     endpoint.focas.cncRdProgNum()
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "6":
                     msg.topic = "Sample Data"; 
                     endpoint.focas.sampleData(config.sampleDataNo, config.sampleDataChannels)
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 case "7":
                     msg.topic = "Alarm Messages"; 
                     endpoint.focas.cncRdAlmMsg2(config.almType - 1 , config.almCount)
-                    .then((data) => sendMsg(msg, send, done, data))
-                    .catch((error) => onError(msg,done,error))
+                    .then((data) => this.sendMsg(msg, send, done, data))
+                    .catch((error) => this.onError(msg,done,error))
                     break;
                 default:
-                    RED._('focas.function.unknown');
-                    done(new Error(RED._('focas.function.unknown')));
+                    this.onError(msg,done,RED._('focas.endpoint.error.unknown'))
             }
         });
 
