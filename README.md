@@ -2,7 +2,7 @@
 
 Node-RED node designed for reading data from a Fanuc CNC. 
 
-This node was designed by [ST-One](https://st-one.io). It depends on the `node-focas` library that is currently only available bundled on the [ST-One hardware](https://st-one.io/st-one).
+This node was designed by [ST-One](https://st-one.io). It depends on the `@protocols/node-focas` library that is currently only available bundled on the [ST-One hardware](https://st-one.io/hardware).
 
 The list below contains all functions currently supported by the node.
 - **System Info:** Reads status information of CNC
