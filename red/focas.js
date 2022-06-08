@@ -66,7 +66,7 @@ module.exports = function (RED) {
             this.focas.on('error', error => this.onError(error));
             this.focas.on('timeout', error => this.onTimeout(error));
             this.focas.on('connected', () => this.manageStatus('online'));
-            this.focas.on('disconnected', error => this.onDisconnected(error));
+            this.focas.on('disconnected', () => this.onDisconnected());
 
             this.focas.connect();
         }
@@ -85,7 +85,7 @@ module.exports = function (RED) {
 
         this.disconnect = () => {
             this.manageStatus('offline');
-            this.focas.destroy()
+            if (this.focas) this.focas.destroy();
         }
 
         this.onDisconnected = () => {
