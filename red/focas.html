@@ -45,20 +45,6 @@
         </select>
     </div> -->
 
-    <div class="form-row">
-        <label for="node-config-input-logLevel">
-            <i class="fa fa-info-circle"></i>
-            <span data-i18n="focas.config.label.log.text"></span>
-        </label>
-        <select type="text" id="node-config-input-logLevel">
-            <option value="error" data-i18n="focas.config.label.log.error"></option>
-            <option value="warn" data-i18n="focas.config.label.log.warn"></option>
-            <option value="info" data-i18n="focas.config.label.log.info"></option>
-            <option value="debug" data-i18n="focas.config.label.log.debug"></option>
-            <option value="silly" data-i18n="focas.config.label.log.silly"></option>
-        </select>
-    </div>
-
 </script>
 
 <script type="text/html" data-help-name="focas config">
@@ -69,10 +55,6 @@
     <p>
         The <b>Timeout</b> configuration sets the maximum amount of time that the CNC
 		may take to answer our requests.
-	</p>
-    <p>
-		It's possible to change the log level of the FOCAS communication protocol by setting the <b>Log Level</b> option
-		from "Error" to "Silly". Those logs are printed to the Node-RED console.
 	</p>
 
 </script>
@@ -96,10 +78,6 @@
             },
             timeout: {
                 value: 3,
-                required: true
-            },
-            logLevel: {
-                value: "error",
                 required: true
             }
         },

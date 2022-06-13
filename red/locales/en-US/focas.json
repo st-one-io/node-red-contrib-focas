@@ -26,15 +26,7 @@
                 "port": "Port",
                 "timeout": "Timeout",
                 "retries": "Retries",
-                "models": "Model",
-                "log": {
-                    "text": "Log Level",
-                    "error": "Error",
-                    "warn": "Warn",
-                    "info": "Info",
-                    "debug": "Debug",
-                    "silly": "Silly"
-                } 
+                "models": "Model"
             }
         },
         "endpoint": {
@@ -48,10 +40,9 @@
                 "default": "Error",
                 "socket": "Socket Error. Check if machine is reachable",
                 "closed":"Connectin closed due to an unkown error",
-                "timeout": "Socket timeout. Check your connection"
-            },
-            "functions": {
-                "unknown": "ERR_UN_FN - An unknown function was called"
+                "timeout": "Socket timeout. Check your connection",
+                "offline": "Status offline, skipping request...",
+                "unknown": "An unknown function was called"
             }
         },
         "util": {
