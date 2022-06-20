@@ -2,7 +2,13 @@
   Copyright: (c) 2018-2021, ST-One
   GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 */
-const FocasEndpoint = require('@protocols/node-focas');
+
+try {
+    var FocasEndpoint = require('@protocols/node-focas');
+} catch (error) {
+    var FocasEndpoint = null;
+}
+
 
 module.exports = function (RED) {
     
@@ -57,6 +63,9 @@ module.exports = function (RED) {
         }
 
         this.connect = () => {
+            
+            if (!FocasEndpoint) return this.error('Missing "@protocols/node-focas" dependency, avaliable only on the ST-One hardware. Please contact us at "st-one.io" for pricing and more information.')
+            
             this.manageStatus('connecting');
 
             this.clear();
@@ -86,6 +95,7 @@ module.exports = function (RED) {
         this.disconnect = () => {
             this.manageStatus('offline');
             if (this.focas) this.focas.destroy();
+            else if (this.onCloseCallback) this.onCloseCallback();
         }
 
         this.onDisconnected = () => {
