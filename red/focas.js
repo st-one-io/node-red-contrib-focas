@@ -95,6 +95,7 @@ module.exports = function (RED) {
         this.disconnect = () => {
             this.manageStatus('offline');
             if (this.focas) this.focas.destroy();
+            else if (this.onCloseCallback) this.onCloseCallback();
         }
 
         this.onDisconnected = () => {
