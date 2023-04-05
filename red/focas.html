@@ -192,6 +192,17 @@
         </div>
     </div>
 
+    <!-- Macro -->
+    <div id="macro">
+        <div class="form-row">
+            <label for="node-input-macroNumber">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.macroNumber"></span>
+            </label>
+            <input type="text" id="node-input-macroNumber" style="width: 140px" data-i18n="[placeholder]focas.node.label.macroNumber">
+        </div>
+    </div>
+
     <br>
 
     <div class="form-row">
@@ -424,8 +435,10 @@
                           "External alarm message (EX)","","","", // reserved
                           "PMC error (PC)"]
             },
+            {
+                "text": "Macro"
+            }
         ]
-
         RED.nodes.registerType('focas node', {
             category: 'CNC',
             color: '#ffdd00',
@@ -484,6 +497,9 @@
                         return true;
                     }
                 },
+                macroNumber: {
+                    value: 0,
+                }
             },
             inputs: 1,
             outputs: 1,
@@ -513,6 +529,7 @@
                 const sample_data = $("#sampleData");
                 const parameters = $("#parameters");
                 const alarms = $("#alarms");
+                const macro = $("#macro")
 
                 const input_axes_data_type = $("#node-input-axesDataType");
 
@@ -592,6 +609,7 @@
                     sample_data.hide();
                     parameters.hide();
                     alarms.hide();
+                    macro.hide();
 
                     switch(currentFn) {
                     case "2":    
@@ -609,6 +627,9 @@
                     case "7":    
                         alarms.show();
                         break;
+                    case "8":
+                        macro.show();
+                        break
                     }
                 }
 
