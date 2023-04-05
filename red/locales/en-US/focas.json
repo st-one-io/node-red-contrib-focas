@@ -17,7 +17,8 @@
                 "paramAxis": "Axis",
                 "sampleDataNo": "No. of samples",
                 "almType": "Type",
-                "almCount": "Count"
+                "almCount": "Count",
+                "macroNumber": "Number"
             }
         },
         "config": {
