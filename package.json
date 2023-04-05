@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-focas",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Node-RED Node to communicate with CNCs using Fanuc FOCAS protocol",
   "main": "focas.js",
   "scripts": {
@@ -28,6 +28,6 @@
     }
   },
   "optionalDependencies": {
-    "@protocols/node-focas": "^1.1.1"
+    "@protocols/node-focas": "^1.1.2"
   }
 }
