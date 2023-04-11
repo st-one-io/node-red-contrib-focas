@@ -216,6 +216,12 @@ module.exports = function (RED) {
                     .then((data) => this.sendMsg(msg, send, done, data))
                     .catch((error) => this.onError(msg,done,error))
                     break;
+                case "8":
+                    msg.topic = "Macro"
+                    endpoint.focas.cncRdMacro(config.numberMacro)
+                    .then((data) => {this.sendMsg(msg, send, done, data)})
+                    .catch((error) => this.onError(msg,done,error))
+                    break;
                 default:
                     this.onError(msg,done,RED._('focas.endpoint.error.unknown'))
             }
