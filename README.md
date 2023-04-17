@@ -1,6 +1,6 @@
 # node-red-contrib-focas
 
-Node-RED node designed for reading data from a Fanuc CNC. 
+Node-RED node designed for reading data from a Fanuc CNC using the FOCAS1/2 protocol.
 
 This node was designed by [ST-One](https://st-one.io). It depends on the `@protocols/node-focas` library that is currently only available bundled on the [ST-One hardware](https://st-one.io/hardware).
 
@@ -13,6 +13,7 @@ The list below contains all functions currently supported by the node.
 - **Program Number:** Reads program number of the program that is currently being selected on the CNC.
 - **Sample Data:** Samples data from CNC.
 - **Alarm Messages:** Reads currently active CNC alarm messages.
+- **Read Macro:** Reads the custom macro variable specified.
 
 
 
