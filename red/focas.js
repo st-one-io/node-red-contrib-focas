@@ -218,7 +218,7 @@ module.exports = function (RED) {
                     break;
                 case "8":
                     msg.topic = "Macro"
-                    endpoint.focas.cncRdMacro(config.numberMacro)
+                    endpoint.focas.cncRdMacro(config.macroNumber)
                     .then((data) => {this.sendMsg(msg, send, done, data)})
                     .catch((error) => this.onError(msg,done,error))
                     break;
