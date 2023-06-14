@@ -28,6 +28,6 @@
     }
   },
   "optionalDependencies": {
-    "@protocols/node-focas": "^1.2.1"
+    "@protocols/node-focas": "^1.2.3"
   }
 }
