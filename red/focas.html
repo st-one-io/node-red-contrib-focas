@@ -437,6 +437,9 @@
             },
             {
                 "text": "Macro"
+            },
+            {
+                "text": "Read Exec Program"
             }
         ]
         RED.nodes.registerType('focas node', {
@@ -499,6 +502,9 @@
                 },
                 macroNumber: {
                     value: 0,
+                },
+                rdexecProg: {
+                    value: 0
                 }
             },
             inputs: 1,
@@ -530,6 +536,7 @@
                 const parameters = $("#parameters");
                 const alarms = $("#alarms");
                 const macro = $("#macro")
+                const execprog = $("#execprog");
 
                 const input_axes_data_type = $("#node-input-axesDataType");
 
@@ -610,6 +617,7 @@
                     parameters.hide();
                     alarms.hide();
                     macro.hide();
+                    execprog.hide();
 
                     switch(currentFn) {
                     case "2":    
@@ -629,7 +637,10 @@
                         break;
                     case "8":
                         macro.show();
-                        break
+                        break;
+                    case "9":
+                        execprog.show();
+                        break;
                     }
                 }
 
