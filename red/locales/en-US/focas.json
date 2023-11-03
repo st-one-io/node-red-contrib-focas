@@ -19,7 +19,7 @@
                 "almType": "Type",
                 "almCount": "Count",
                 "macroNumber": "Number",
-                "rdexecProg": "Exec Program"
+                "rdexecProg": "Length"
             }
         },
         "config": {
