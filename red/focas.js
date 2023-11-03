@@ -224,7 +224,7 @@ module.exports = function (RED) {
                     break;
                 case "9":
                     msg.topic = "Exec Program";
-                    endpoint.focas.cncRdExecProg()
+                    endpoint.focas.cncRdExecProg(config.rdexecProg)
                     .then((data) => {this.sendMsg(msg, send, done, data)})
                     .catch((error) => this.onError(msg,done,error))
                     break;
