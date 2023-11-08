@@ -107,7 +107,6 @@ module.exports = function (RED) {
             
             if (!this.retryTimeout) {
                 this.retryTimeout = setTimeout(this.connect, 8000)
-                this.warn(RED._('focas.info.reconnect'));
             }
         }
 
@@ -116,7 +115,7 @@ module.exports = function (RED) {
         }
 
         this.onError = (error) => {
-            this.error(error);
+            this.error(`${error}`,error);
             this.disconnect();
         };
 
