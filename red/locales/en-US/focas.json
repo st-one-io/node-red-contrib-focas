@@ -18,7 +18,8 @@
                 "sampleDataNo": "No. of samples",
                 "almType": "Type",
                 "almCount": "Count",
-                "macroNumber": "Number"
+                "macroNumber": "Number",
+                "rdexecProg": "Length"
             }
         },
         "config": {

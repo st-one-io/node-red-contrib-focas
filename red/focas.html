@@ -203,6 +203,17 @@
         </div>
     </div>
 
+    <!-- RdExecProg -->
+    <div id="execprog">
+        <div class="form-row">
+            <label for="node-input-rdexecProg">
+                <i class="fa fa-bars"></i>
+                <span data-i18n="focas.node.label.rdexecProg"></span>
+            </label>
+            <select style="width:70%" id="node-input-rdexecProg"></select>
+        </div>
+    </div>
+
     <br>
 
     <div class="form-row">
@@ -437,6 +448,10 @@
             },
             {
                 "text": "Macro"
+            },
+            {
+                "text": "Read Exec Program",
+                "length": ["64","128","256","512","1024"]
             }
         ]
         RED.nodes.registerType('focas node', {
@@ -499,6 +514,9 @@
                 },
                 macroNumber: {
                     value: 0,
+                },
+                rdexecProg: {
+                    value: "",
                 }
             },
             inputs: 1,
@@ -530,6 +548,7 @@
                 const parameters = $("#parameters");
                 const alarms = $("#alarms");
                 const macro = $("#macro")
+                const execprog = $("#execprog");
 
                 const input_axes_data_type = $("#node-input-axesDataType");
 
@@ -599,6 +618,16 @@
 
                     // /* ------------------- */
 
+                    // Rd Exec Prog
+                    const input_rdexec_length = $("#node-input-rdexecProg");
+                    functions[9].length.forEach((item, index) => {
+                        input_rdexec_length.append($(`<option>`).val(index).text(item));
+                    });
+
+                    if (node.rdexecProg !== "") input_rdexec_length.val(node.rdexecProg);
+                    else input_rdexec_length.val(0);
+
+                    /* ------------------- */
                 }
 
                 function updateFnFields() {
@@ -610,6 +639,7 @@
                     parameters.hide();
                     alarms.hide();
                     macro.hide();
+                    execprog.hide();
 
                     switch(currentFn) {
                     case "2":    
@@ -629,7 +659,10 @@
                         break;
                     case "8":
                         macro.show();
-                        break
+                        break;
+                    case "9":
+                        execprog.show();
+                        break;
                     }
                 }
 

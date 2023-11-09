@@ -107,7 +107,6 @@ module.exports = function (RED) {
             
             if (!this.retryTimeout) {
                 this.retryTimeout = setTimeout(this.connect, 8000)
-                this.warn(RED._('focas.info.reconnect'));
             }
         }
 
@@ -116,7 +115,7 @@ module.exports = function (RED) {
         }
 
         this.onError = (error) => {
-            this.error(error);
+            this.error(`${error}`,error);
             this.disconnect();
         };
 
@@ -219,6 +218,12 @@ module.exports = function (RED) {
                 case "8":
                     msg.topic = "Macro"
                     endpoint.focas.cncRdMacro(config.macroNumber)
+                    .then((data) => {this.sendMsg(msg, send, done, data)})
+                    .catch((error) => this.onError(msg,done,error))
+                    break;
+                case "9":
+                    msg.topic = "Exec Program";
+                    endpoint.focas.cncRdExecProg(config.rdexecProg)
                     .then((data) => {this.sendMsg(msg, send, done, data)})
                     .catch((error) => this.onError(msg,done,error))
                     break;
