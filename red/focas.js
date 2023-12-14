@@ -52,6 +52,7 @@ module.exports = function (RED) {
         this.connectionStatus = 'unknown';
         this.retryTimeout = null;
         this.onCloseCallback = null;
+        let msg ={}
 
         this.focas = null;
 
@@ -111,11 +112,11 @@ module.exports = function (RED) {
         }
 
         this.onTimeout = () => {
-            this.onError(RED._('focas.endpoint.error.timeout'));
+            this.onError({Timeout:RED._('focas.endpoint.error.timeout')});
         }
 
         this.onError = (error) => {
-            this.error(`${error}`,error);
+            this.error(`${error}`,msg.error);
             this.disconnect();
         };
 
